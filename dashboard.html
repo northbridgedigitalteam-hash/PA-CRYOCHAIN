@@ -1,1 +1,252 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryoChain | Client Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-page">
+    <!-- ===== DASHBOARD HEADER ===== -->
+    <header class="dashboard-header">
+        <nav>
+            <div class="logo">
+                <i class="fas fa-snowflake logo-icon"></i>
+                <span>CryoChain</span>
+                <span class="badge-live">LIVE</span>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name">John Exporters Inc.</span>
+                    <span class="user-role">Premium Client</span>
+                </div>
+                <button class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+        
+        <div class="dashboard-subnav">
+            <div class="company-info">
+                <h1><i class="fas fa-tachometer-alt"></i> Shipment Dashboard</h1>
+                <p>Real-time tracking for all your perishable shipments</p>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Active Shipments</span>
+                    <span class="stat-value" id="activeShipments">8</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">In Transit</span>
+                    <span class="stat-value" id="inTransit">6</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">On Schedule</span>
+                    <span class="stat-value" id="onSchedule">7</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Temperature OK</span>
+                    <span class="stat-value" id="tempOk">8</span>
+                </div>
+            </div>
+        </div>
+    </header>
+ 
+    <!-- ===== DASHBOARD LAYOUT ===== -->
+    <div class="dashboard-container">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-ship"></i>
+                    <span>All Shipments</span>
+                    <span class="nav-badge">8</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-plane"></i>
+                    <span>Air Freight</span>
+                    <span class="nav-badge">3</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-anchor"></i>
+                    <span>Sea Freight</span>
+                    <span class="nav-badge">5</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-temperature-low"></i>
+                    <span>Temperature Alert</span>
+                    <span class="nav-badge alert">1</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Delayed</span>
+                    <span class="nav-badge warning">1</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-file-contract"></i>
+                    <span>Documents</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <div class="status-indicator online"></div>
+                    <span>System Status: Online</span>
+                </div>
+                <div class="last-updated">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Updated just now</span>
+                </div>
+            </div>
+        </aside>
+ 
+        <!-- ===== MAIN DASHBOARD CONTENT ===== -->
+        <main class="dashboard-content">
+            <!-- ===== SHIPMENTS TABLE ===== -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-boxes"></i> Active Shipments</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> New Shipment
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="shipments-table-container">
+                    <table class="shipments-table">
+                        <thead>
+                            <tr>
+                                <th>Shipment ID</th>
+                                <th>Product</th>
+                                <th>Origin → Destination</th>
+                                <th>Current Location</th>
+                                <th>Temperature</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Documents</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shipmentsTable">
+                            <!-- Shipment rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+ 
+            <!-- ===== MAP & TRACKING SECTION ===== -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-map-marked-alt"></i> Live Tracking Map</h2>
+                    <div class="map-controls">
+                        <button class="btn-map-control active" data-layer="shipments">
+                            <i class="fas fa-ship"></i> Shipments
+                        </button>
+                        <button class="btn-map-control" data-layer="temperature">
+                            <i class="fas fa-thermometer-half"></i> Temperature
+                        </button>
+                        <button class="btn-map-control" data-layer="routes">
+                            <i class="fas fa-route"></i> Routes
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="map-container">
+                    <div id="trackingMap"></div>
+                    <div class="map-legend">
+                        <h4><i class="fas fa-key"></i> Legend</h4>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #10b981;"></span>
+                            <span>On Schedule</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #f59e0b;"></span>
+                            <span>Delayed</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #ef4444;"></span>
+                            <span>Temperature Alert</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #3b82f6;"></span>
+                            <span>In Transit</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+ 
+            <!-- ===== DOCUMENTS & TIMELINE SECTION ===== -->
+            <div class="columns-2">
+                <!-- Documents Column -->
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-file-alt"></i> Document Status</h2>
+                        <button class="btn btn-secondary btn-sm">
+                            <i class="fas fa-eye"></i> View All
+                        </button>
+                    </div>
+                    
+                    <div class="documents-list" id="documentsList">
+                        <!-- Documents will be populated by JavaScript -->
+                    </div>
+                </section>
+ 
+                <!-- Timeline Column -->
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                    </div>
+                    
+                    <div class="timeline" id="activityTimeline">
+                        <!-- Timeline items will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
+ 
+            <!-- ===== QUICK ACTIONS ===== -->
+            <section class="dashboard-section quick-actions">
+                <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                <div class="actions-grid">
+                    <button class="action-card" data-action="track">
+                        <i class="fas fa-search-location"></i>
+                        <span>Track New Shipment</span>
+                    </button>
+                    <button class="action-card" data-action="document">
+                        <i class="fas fa-file-upload"></i>
+                        <span>Upload Document</span>
+                    </button>
+                    <button class="action-card" data-action="alert">
+                        <i class="fas fa-bell"></i>
+                        <span>Set Alert</span>
+                    </button>
+                    <button class="action-card" data-action="report">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Generate Report</span>
+                    </button>
+                    <button class="action-card" data-action="dhl">
+                        <i class="fas fa-truck"></i>
+                        <span>DHL Integration</span>
+ 
+ 
