@@ -3,245 +3,486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryoChain | Cold Chain Intelligence Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <title>CryoChain | Live Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .logo-icon {
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .badge-live {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            margin-left: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+        
+        .dashboard-main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .welcome-banner {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: slideIn 0.6s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            color: #1a2980;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a2980;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .temp-normal {
+            color: #10b981;
+        }
+        
+        .temp-warning {
+            color: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+        
+        .temp-alert {
+            color: #ef4444;
+            animation: shake 0.5s infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shipments-table {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            color: #475569;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-ontime {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+        
+        .status-delayed {
+            background: #fffbeb;
+            color: #d97706;
+        }
+        
+        .status-intransit {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        .container-animation {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+            height: 120px;
+        }
+        
+        .container-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #cbd5e1;
+            transform: translateY(-50%);
+        }
+        
+        .moving-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            width: 60px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            animation: moveRight 10s linear infinite;
+        }
+        
+        @keyframes moveRight {
+            0% { left: 0; transform: translateY(-50%); }
+            100% { left: calc(100% - 60px); transform: translateY(-50%); }
+        }
+        
+        .map-placeholder {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            height: 300px;
+            border-radius: 15px;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 1.2rem;
+            animation: pulse 3s infinite;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-main {
+                padding: 0 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <!-- ===== HEADER ===== -->
-    <header>
-        <nav>
+    <header class="dashboard-header">
+        <div class="header-content">
             <div class="logo">
                 <i class="fas fa-snowflake logo-icon"></i>
                 <span>CryoChain</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#industries">Industries</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="dashboard.html" class="nav-button">Live Dashboard</a></li>
-            </ul>
-        </nav>
-        
-        <div class="hero">
-            <h1>Cold Chain Intelligence for Perishable Exports</h1>
-            <p class="hero-subtitle">Real-time monitoring, predictive analytics, and automated compliance for temperature-sensitive shipments</p>
-            <div class="cta-buttons">
-                <a href="dashboard.html" class="cta-button">
-                    <i class="fas fa-rocket"></i> Launch Live Dashboard
-                </a>
-                <a href="#demo" class="cta-button secondary">
-                    <i class="fas fa-play-circle"></i> Watch Demo
-                </a>
+                <span class="badge-live">
+                    <i class="fas fa-circle"></i> LIVE
+                </span>
             </div>
             
-            <!-- Animated cold chain visualization -->
-            <div class="hero-visualization">
-                <div class="chain-link">
-                    <div class="link-icon"><i class="fas fa-warehouse"></i></div>
-                    <div class="link-label">Warehouse</div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle fa-2x"></i>
                 </div>
-                <div class="chain-connector animated"></div>
-                <div class="chain-link">
-                    <div class="link-icon"><i class="fas fa-truck"></i></div>
-                    <div class="link-label">Transport</div>
-                </div>
-                <div class="chain-connector animated"></div>
-                <div class="chain-link">
-                    <div class="link-icon"><i class="fas fa-plane"></i></div>
-                    <div class="link-label">Air Freight</div>
-                </div>
-                <div class="chain-connector animated"></div>
-                <div class="chain-link">
-                    <div class="link-icon"><i class="fas fa-ship"></i></div>
-                    <div class="link-label">Sea Freight</div>
-                </div>
-                <div class="chain-connector animated"></div>
-                <div class="chain-link">
-                    <div class="link-icon"><i class="fas fa-store"></i></div>
-                    <div class="link-label">Retail</div>
+                <div>
+                    <div class="user-name">Global Exports Inc.</div>
+                    <div class="user-role">Premium Client</div>
                 </div>
             </div>
         </div>
     </header>
-
-    <!-- ===== FEATURES ===== -->
-    <section class="section" id="features">
-        <div class="section-title">
-            <h2>Intelligent Cold Chain Features</h2>
-            <p>End-to-end visibility and control for your perishable shipments</p>
-        </div>
-        
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-thermometer-half"></i>
-                </div>
-                <h3>Real-Time Temperature Monitoring</h3>
-                <p>24/7 IoT sensor tracking with predictive alerts for temperature excursions</p>
-                <ul class="feature-list">
-                    <li>±0.1°C accuracy</li>
-                    <li>Predictive alerts</li>
-                    <li>Historical data analysis</li>
-                </ul>
-            </div>
+    
+    <main class="dashboard-main">
+        <div class="welcome-banner">
+            <h1>🚢 Cold Chain Intelligence Dashboard</h1>
+            <p>Real-time monitoring for your perishable shipments</p>
             
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-map-marked-alt"></i>
-                </div>
-                <h3>Live Container Tracking</h3>
-                <p>Animated global map showing real-time container movements and status</p>
-                <ul class="feature-list">
-                    <li>GPS & satellite tracking</li>
-                    <li>ETA predictions</li>
-                    <li>Route optimization</li>
-                </ul>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <h3>Automated Compliance</h3>
-                <p>Automated document generation and regulatory compliance tracking</p>
-                <ul class="feature-list">
-                    <li>Auto-generate certificates</li>
-                    <li>Regulatory updates</li>
-                    <li>Audit trail</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== INDUSTRIES ===== -->
-    <section class="section" id="industries">
-        <div class="section-title">
-            <h2>Trusted by Industry Leaders</h2>
-            <p>Serving the most demanding cold chain requirements</p>
-        </div>
-        
-        <div class="industries-grid">
-            <div class="industry-card">
-                <div class="industry-icon">
-                    <i class="fas fa-apple-alt"></i>
-                </div>
-                <h4>Fresh Produce</h4>
-                <p>Fruits, vegetables, berries</p>
-            </div>
-            
-            <div class="industry-card">
-                <div class="industry-icon">
-                    <i class="fas fa-fish"></i>
-                </div>
-                <h4>Seafood</h4>
-                <p>Fish, shellfish, aquaculture</p>
-            </div>
-            
-            <div class="industry-card">
-                <div class="industry-icon">
-                    <i class="fas fa-pills"></i>
-                </div>
-                <h4>Pharmaceuticals</h4>
-                <p>Vaccines, biologics, medicines</p>
-            </div>
-            
-            <div class="industry-card">
-                <div class="industry-icon">
-                    <i class="fas fa-leaf"></i>
-                </div>
-                <h4>Floral</h4>
-                <p>Flowers, plants, nursery</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== DEMO REQUEST ===== -->
-    <section class="section" id="demo">
-        <div class="section-title">
-            <h2>Request a Live Demo</h2>
-            <p>See how CryoChain can transform your cold chain operations</p>
-        </div>
-        
-        <div class="demo-form">
-            <form id="demoRequestForm">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" required placeholder="John Smith">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Active Shipments</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-detail">Across 8 countries</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="company">Company</label>
-                    <input type="text" id="company" required placeholder="Your Company Inc.">
+                <div class="stat-card">
+                    <div class="stat-label">Temperature OK</div>
+                    <div class="stat-value">10</div>
+                    <div class="stat-detail">2 alerts detected</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="john@company.com">
+                <div class="stat-card">
+                    <div class="stat-label">On Schedule</div>
+                    <div class="stat-value">9</div>
+                    <div class="stat-detail">75% on-time delivery</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="industry">Primary Industry</label>
-                    <select id="industry" required>
-                        <option value="">Select Industry</option>
-                        <option value="fruits">Fresh Fruits & Vegetables</option>
-                        <option value="seafood">Seafood</option>
-                        <option value="pharma">Pharmaceuticals</option>
-                        <option value="floral">Floral</option>
-                        <option value="meat">Meat & Poultry</option>
-                        <option value="dairy">Dairy</option>
-                    </select>
+                <div class="stat-card">
+                    <div class="stat-label">Documents Complete</div>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-detail">3 pending</div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="message">Specific Requirements</label>
-                    <textarea id="message" rows="4" placeholder="Tell us about your cold chain challenges..."></textarea>
-                </div>
-                
-                <button type="submit" class="cta-button">
-                    <i class="fas fa-calendar-check"></i> Schedule Demo
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- ===== FOOTER ===== -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>CryoChain</h3>
-                <p>Intelligent Cold Chain Platform for perishable exports. Real-time tracking, monitoring, and compliance.</p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="dashboard.html">Live Dashboard</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#industries">Industries</a></li>
-                    <li><a href="#demo">Request Demo</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact</h3>
-                <ul class="footer-links">
-                    <li><i class="fas fa-envelope"></i> support@cryochain.com</li>
-                    <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Global Coverage</li>
-                </ul>
             </div>
         </div>
         
-        <div class="copyright">
-            <p>&copy; 2024 CryoChain. All rights reserved. | Cold Chain Intelligence Platform</p>
+        <!-- Container Animation -->
+        <div class="container-animation">
+            <div class="container-track"></div>
+            <div class="moving-container">
+                <i class="fas fa-ship"></i>
+            </div>
+            <div style="text-align: center; margin-top: 50px; color: #64748b;">
+                <i class="fas fa-play-circle"></i> Live Container Tracking Simulation
+            </div>
         </div>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="script.js"></script>
+        
+        <!-- Map Placeholder -->
+        <div class="map-placeholder">
+            <div style="text-align: center;">
+                <i class="fas fa-map-marked-alt fa-3x" style="margin-bottom: 1rem;"></i>
+                <div>Live Tracking Map</div>
+                <small>Interactive container positions and routes</small>
+            </div>
+        </div>
+        
+        <!-- Shipments Table -->
+        <div class="shipments-table">
+            <h2><i class="fas fa-boxes"></i> Active Shipments</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Shipment ID</th>
+                        <th>Product</th>
+                        <th>Temperature</th>
+                        <th>Status</th>
+                        <th>ETA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SC-2024-001</strong></td>
+                        <td><i class="fas fa-apple-alt"></i> Fresh Berries</td>
+                        <td class="temp-normal">2.8°C ✅</td>
+                        <td><span class="status-badge status-intransit">In Transit</span></td>
+                        <td>Feb 5, 2024</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SC-2024-002</strong></td>
+                        <td><i class="fas fa-fish"></i> Atlantic Salmon</td>
+                        <td class="temp-alert">-21.5°C ⚠️</td>
+                        <td><span class="status-badge status-delayed">Delayed</span></td>
+                        <td>Feb 15, 2024</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SC-2024-003</strong></td>
+                        <td><i class="fas fa-pills"></i> Vaccines</td>
+                        <td class="temp-warning">4.8°C ⚠️</td>
+                        <td><span class="status-badge status-intransit">In Transit</span></td>
+                        <td>Jan 25, 2024</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SC-2024-004</strong></td>
+                        <td><i class="fas fa-leaf"></i> Orchids</td>
+                        <td class="temp-normal">2.2°C ✅</td>
+                        <td><span class="status-badge status-ontime">On Time</span></td>
+                        <td>Jan 24, 2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <button class="back-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </button>
+    </main>
+    
+    <script>
+        console.log("✅ Dashboard loaded successfully!");
+        
+        // Update live time
+        function updateLiveTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            console.log("Live update:", timeString);
+        }
+        
+        // Update every second
+        setInterval(updateLiveTime, 1000);
+        updateLiveTime();
+        
+        // Simulate temperature changes
+        setInterval(() => {
+            const tempElements = document.querySelectorAll('.temp-normal, .temp-warning, .temp-alert');
+            tempElements.forEach(el => {
+                if (Math.random() > 0.7) {
+                    if (el.classList.contains('temp-normal')) {
+                        el.classList.remove('temp-normal');
+                        el.classList.add('temp-warning');
+                        el.innerHTML = el.innerHTML.replace('✅', '⚠️');
+                    } else if (el.classList.contains('temp-warning')) {
+                        el.classList.remove('temp-warning');
+                        el.classList.add('temp-normal');
+                        el.innerHTML = el.innerHTML.replace('⚠️', '✅');
+                    }
+                }
+            });
+        }, 5000);
+    </script>
 </body>
 </html>
