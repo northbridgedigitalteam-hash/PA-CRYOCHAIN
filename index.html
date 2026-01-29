@@ -3,19 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryoChain - Cold Chain Logistics Intelligence</title>
+    <title>CryoChain | Cold-Chain Logistics Intelligence Platform</title>
+    <meta name="description" content="Real-time cold-chain logistics intelligence for perishable exports. Monitor temperature, humidity, and shipments from harvest to destination.">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
 <body>
+    <!-- ===== HEADER & NAVIGATION ===== -->
     <header>
         <nav>
             <div class="logo">
-                <i class="fas fa-snowflake"></i>
+                <i class="fas fa-snowflake logo-icon"></i>
                 <span>CryoChain</span>
+                <span class="status-indicator status-active">LIVE</span>
             </div>
+            
             <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#solutions">Solutions</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#
+                <li><a href="#features"><i class="fas fa-star"></i> Features</a></li>
+                <li><a href="#solutions"><i class="fas fa-industry"></i> Industries</a></li>
+                <li><a href="#technology"><i class="fas fa-microchip"></i> Technology</a></li>
+                <li><a href="#demo"><i class="fas fa-calendar-check"></i> Demo</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+            
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+ 
+        <!-- ===== HERO SECTION ===== -->
+        <div class="hero">
+            <h1>Cold-Chain Logistics Intelligence</h1>
+            <p class="hero-subtitle">Monitor, protect, and optimize your perishable shipments from harvest to final destination with real-time AI-powered insights.</p>
+            
+            <!-- REAL-TIME DASHBOARD WIDGET -->
+            <div class="dashboard-widget">
+                <div class="widget">
+                    <div class="widget-icon">
+                        <i class="fas fa-thermometer-half"></i>
+                    </div>
+                    <div class="widget-content">
+                        <div class="widget-label">Current Temperature</div>
+                        <div id="currentTemp" class="widget-value">4.2°C</div>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div class="widget-content">
+                        <div class="widget-label">Current Humidity</div>
+                        <div id="currentHumidity" class="widget-value">65%</div>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="widget-content">
+                        <div class="widget-label">Active Shipments</div>
+                        <div id="shipmentsCount" class="widget-value">24</div>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="widget-content">
+                        <div class="widget-label">Risk Level</div>
+                        <div id="riskIndicator" class="widget-value status-indicator status-low">LOW</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p id="lastUpdated" class="timestamp">Last updated: 14:32:45</p>
+            
+            <div class="cta-buttons">
+                <a href="#demo" class="cta-button">
+                    <i class="fas fa-play-circle"></i> Request Live Demo
+                </a>
+                <a href="#features" class="cta-button secondary">
+                    <i class="fas fa-chart-line"></i> View Features
+                </a>
+            </div>
+        </div>
+    </header>
+ 
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <!-- ===== FEATURES SECTION ===== -->
+        <section id="features" class="section">
+            <div class="section-title">
+                <h2><i class="fas fa-globe-americas"></i> What CryoChain Does</h2>
+                <p class="section-subtitle">Orchestrating the entire perishables workflow with precision and intelligence</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Multimodal Shipment Planning</h3>
+                    <p>Plan and book air, sea, and land shipments with real-time capacity and rate intelligence.</p>
+                    <ul class="feature-list">
+                        <li>Automated route optimization</li>
+                        <li>Carrier performance scoring</li>
+                        <li>Real-time capacity tracking</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-temperature-low"></i>
+                    </div>
+                    <h3>Real-time Sensor Monitoring</h3>
+                    <p>Continuous monitoring of temperature, humidity, location, and environmental conditions.</p>
+                    <ul class="feature-list">
+                        <li>IoT sensor integration</li>
+                        <li>15-second update intervals</li>
+                        <li>Historical trend analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Risk Prediction</h3>
+                    <p>Predict spoilage and delays before they occur with machine learning models.</p>
+                    <ul class="feature-list">
+                        <li>ETA forecasting</li>
+                        <li>Spoilage-risk scoring</li>
+                        <li>Automated interventions</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <h3>Automated Compliance</h3>
+                    <p>Generate and manage export documentation with automated regulatory checks.</p>
+                    <ul class="feature-list">
+                        <li>Digital phytosanitary certificates</li>
+                        <li>Health certificate automation</li>
+                        <li>Customs documentation</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Smart Alerting System</h3>
+                    <p>Receive instant notifications when conditions deviate from optimal ranges.</p>
+                    <ul class="feature-list">
+                        <li>Multi-channel notifications</li>
+                        <li>Escalation workflows</li>
+                        <li>Root-cause analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Performance Analytics</h3>
+                    <p>Comprehensive analytics on carrier performance, route efficiency, and quality metrics.</p>
+                    <ul class="feature-list">
+                        <li>Custom dashboards</li>
+                        <li>Executive reporting</li>
+                        <li>Claim prevention insights</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== INDUSTRIES SECTION ===== -->
+        <section id="solutions" class="section bg-light">
+            <div class="section-title">
+                <h2><i class="fas fa-industry"></i> Built for Cold Chain Excellence</h2>
+                <p class="section-subtitle">Specialized solutions for temperature-sensitive supply chains</p>
+            </div>
+            
+            <div class="industries-grid">
+                <div class="industry-card">
+                    <div class="industry-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <h3>Fresh Produce</h3>
+                    <p>For fruits, vegetables, and fresh-cut products requiring precise temperature control.</p>
+                    <div class="industry-stats">
+                        <span class="stat"><i class="fas fa-thermometer"></i> 0-4°C</span>
+                        <span class="stat"><i class="fas fa-clock"></i> 7-21 days</span>
+                    </div>
+                </div>
+                
+                <div class="industry-card">
+                    <div class="industry-icon">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <h3>Seafood & Protein</h3>
+                    <p>End-to-end monitoring for seafood, meat, and poultry shipments.</p>
+                    <div class="industry-stats">
+                        <span class="stat"><i class="fas fa-thermometer"></i> -18 to -25°C</span>
+                        <span class="stat"><i class="fas fa-clock"></i> Critical</span>
+                    </div>
+                </div>
+                
+                <div class="industry-card">
+                    <div class="industry-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h3>Pharmaceuticals</h3>
+                    <p>GDP-compliant monitoring for vaccines, biologics, and temperature-sensitive drugs.</p>
+                    <div class="industry-stats">
+                        <span class="stat"><i class="fas fa-thermometer"></i> 2-8°C</span>
+                        <span class="stat"><i class="fas fa-shield-alt"></i> GDP</span>
+                    </div>
+                </div>
+                
+                <div class="industry-card">
+                    <div class="industry-icon">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h3>Floral Exports</h3>
+                    <p>Preserve freshn
+ 
