@@ -4,7 +4,589 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CryoChain | Cold Chain Intelligence Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-blue: #1a2980;
+            --secondary-blue: #26d0ce;
+            --accent-blue: #00b4db;
+            --dark-bg: #0f172a;
+            --light-bg: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--light-bg);
+            overflow-x: hidden;
+        }
+        
+        /* ===== HEADER & NAVIGATION ===== */
+        header {
+            background: linear-gradient(135deg, var(--dark-bg), var(--primary-blue));
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            min-height: 100vh;
+            padding-bottom: 4rem;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: cover;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            color: var(--secondary-blue);
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--accent-blue));
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem !important;
+        }
+        
+        /* ===== HERO SECTION ===== */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--white));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--secondary-blue), var(--accent-blue));
+            color: var(--white);
+            padding: 16px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .cta-button.secondary {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .cta-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* ===== FIXED COLD CHAIN VISUALIZATION ===== */
+        .chain-visualization {
+            margin-top: 4rem;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .chain-track {
+            position: relative;
+            height: 150px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .chain-line {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--secondary-blue) 0%, 
+                rgba(38, 208, 206, 0.6) 25%, 
+                rgba(38, 208, 206, 0.3) 50%, 
+                rgba(38, 208, 206, 0.6) 75%, 
+                var(--secondary-blue) 100%);
+            transform: translateY(-50%);
+            border-radius: 2px;
+        }
+        
+        .chain-points {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .chain-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 120px;
+            position: relative;
+        }
+        
+        .point-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.5s ease;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .chain-point.active .point-icon {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--accent-blue));
+            box-shadow: 0 0 25px rgba(38, 208, 206, 0.7);
+            transform: scale(1.1);
+        }
+        
+        .point-label {
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Animated container moving along the chain */
+        .chain-dot {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: var(--secondary-blue);
+            border-radius: 50%;
+            top: 50%;
+            left: 50px;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            box-shadow: 0 0 20px rgba(38, 208, 206, 0.9);
+            animation: moveAlongChain 10s linear infinite;
+        }
+        
+        @keyframes moveAlongChain {
+            0% { left: 50px; }
+            20% { left: calc(50px + 200px); }
+            40% { left: calc(50px + 400px); }
+            60% { left: calc(50px + 600px); }
+            80% { left: calc(50px + 800px); }
+            100% { left: 50px; }
+        }
+        
+        /* Pulsing effect */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(38, 208, 206, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(38, 208, 206, 0);
+            }
+        }
+        
+        .chain-dot {
+            animation: moveAlongChain 10s linear infinite, pulse-glow 2s ease-in-out infinite;
+        }
+        
+        /* ===== FEATURES SECTION ===== */
+        .section {
+            max-width: 1200px;
+            margin: 5rem auto;
+            padding: 0 2rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, var(--secondary-blue), var(--accent-blue));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            color: var(--text-light);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--secondary-blue);
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-list li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        /* ===== INDUSTRIES SECTION ===== */
+        .industries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .industry-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .industry-card:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .industry-icon {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+        
+        /* ===== DEMO FORM ===== */
+        .demo-form {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(38, 208, 206, 0.1);
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--dark-bg);
+            color: var(--white);
+            padding: 4rem 2rem 2rem;
+            margin-top: 5rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+        
+        .footer-section h3 {
+            color: var(--white);
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary-blue);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            
+            .hero {
+                padding: 3rem 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .chain-track {
+                height: 400px;
+            }
+            
+            .chain-points {
+                flex-direction: column;
+                height: 100%;
+                justify-content: space-between;
+            }
+            
+            .chain-line {
+                top: 50px;
+                bottom: 50px;
+                left: 50%;
+                width: 4px;
+                height: auto;
+                background: linear-gradient(180deg, 
+                    var(--secondary-blue) 0%, 
+                    rgba(38, 208, 206, 0.6) 25%, 
+                    rgba(38, 208, 206, 0.3) 50%, 
+                    rgba(38, 208, 206, 0.6) 75%, 
+                    var(--secondary-blue) 100%);
+                transform: translateX(-50%);
+            }
+            
+            @keyframes moveAlongChain {
+                0% { top: 50px; left: 50%; }
+                20% { top: calc(50px + 80px); left: 50%; }
+                40% { top: calc(50px + 160px); left: 50%; }
+                60% { top: calc(50px + 240px); left: 50%; }
+                80% { top: calc(50px + 320px); left: 50%; }
+                100% { top: 50px; left: 50%; }
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section {
+                padding: 0 1rem;
+            }
+        }
+        
+        /* Debug button styles */
+        .debug-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #dc2626;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 9999;
+        }
+    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -19,8 +601,7 @@
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#industries">Industries</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#demo">Request Demo</a></li>
                 <li><a href="dashboard.html" class="nav-button">Live Dashboard</a></li>
             </ul>
         </nav>
@@ -37,36 +618,44 @@
                 </a>
             </div>
             
-            <!-- FIXED Cold Chain Visualization -->
-            <div class="hero-visualization">
-                <div class="chain-container">
-                    <div class="chain-point active" data-step="1">
-                        <div class="point-icon"><i class="fas fa-warehouse"></i></div>
-                        <div class="point-label">Warehouse</div>
+            <!-- ===== FIXED CHAIN ANIMATION ===== -->
+            <div class="chain-visualization">
+                <div class="chain-track">
+                    <div class="chain-line"></div>
+                    <div class="chain-points">
+                        <div class="chain-point" data-step="1">
+                            <div class="point-icon">
+                                <i class="fas fa-warehouse"></i>
+                            </div>
+                            <div class="point-label">Warehouse</div>
+                        </div>
+                        <div class="chain-point" data-step="2">
+                            <div class="point-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="point-label">Transport</div>
+                        </div>
+                        <div class="chain-point" data-step="3">
+                            <div class="point-icon">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <div class="point-label">Air Freight</div>
+                        </div>
+                        <div class="chain-point" data-step="4">
+                            <div class="point-icon">
+                                <i class="fas fa-ship"></i>
+                            </div>
+                            <div class="point-label">Sea Freight</div>
+                        </div>
+                        <div class="chain-point" data-step="5">
+                            <div class="point-icon">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="point-label">Retail</div>
+                        </div>
                     </div>
-                    
-                    <div class="chain-point" data-step="2">
-                        <div class="point-icon"><i class="fas fa-truck"></i></div>
-                        <div class="point-label">Transport</div>
-                    </div>
-                    
-                    <div class="chain-point" data-step="3">
-                        <div class="point-icon"><i class="fas fa-plane"></i></div>
-                        <div class="point-label">Air Freight</div>
-                    </div>
-                    
-                    <div class="chain-point" data-step="4">
-                        <div class="point-icon"><i class="fas fa-ship"></i></div>
-                        <div class="point-label">Sea Freight</div>
-                    </div>
-                    
-                    <div class="chain-point" data-step="5">
-                        <div class="point-icon"><i class="fas fa-store"></i></div>
-                        <div class="point-label">Retail</div>
-                    </div>
-                    
-                    <!-- Animated dot moving through the chain -->
-                    <div class="chain-dot" id="chainDot"></div>
+                    <!-- Animated dot that moves along the chain -->
+                    <div class="chain-dot"></div>
                 </div>
             </div>
         </div>
@@ -245,70 +834,63 @@
         </div>
     </footer>
 
+    <!-- Debug button to check file status -->
+    <div class="debug-button" onclick="checkFiles()">Debug Files</div>
+
     <script>
-        console.log("✅ index.html loaded");
+        console.log("🚀 index.html loaded");
         
-        // Fix for the chain animation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("✅ DOM loaded");
+            console.log("✅ DOM fully loaded");
             
-            // Check if dashboard.html exists
-            fetch('dashboard.html')
-                .then(response => {
-                    if (response.ok) {
-                        console.log("✅ dashboard.html exists and is accessible");
-                        document.getElementById('dashboardBtn').innerHTML = 
-                            '<i class="fas fa-rocket"></i> Launch Live Dashboard ✅';
-                    } else {
-                        console.error("❌ dashboard.html not found!");
-                        document.getElementById('dashboardBtn').innerHTML = 
-                            '<i class="fas fa-exclamation-triangle"></i> Error: dashboard.html missing';
-                        document.getElementById('dashboardBtn').style.background = "#dc2626";
-                        document.getElementById('dashboardBtn').onclick = function(e) {
-                            e.preventDefault();
-                            alert("dashboard.html file is missing!\n\nMake sure you have:\n1. dashboard.html in the same folder\n2. dashboard.css\n3. dashboard.js\n\nAll files should be in the same folder.");
-                        };
-                    }
-                })
-                .catch(error => {
-                    console.error("❌ Error checking dashboard.html:", error);
-                });
-            
-            // Chain animation - FIXED VERSION
-            const chainDot = document.getElementById('chainDot');
+            // Highlight chain points as the dot moves
             const chainPoints = document.querySelectorAll('.chain-point');
-            let currentStep = 0;
+            let currentActive = 0;
             
-            function animateChain() {
+            setInterval(() => {
                 // Remove active class from all points
                 chainPoints.forEach(point => {
                     point.classList.remove('active');
                 });
                 
                 // Add active class to current point
-                chainPoints[currentStep].classList.add('active');
+                chainPoints[currentActive].classList.add('active');
                 
-                // Calculate position for the dot
-                const activePoint = chainPoints[currentStep];
-                const pointRect = activePoint.getBoundingClientRect();
-                const containerRect = document.querySelector('.chain-container').getBoundingClientRect();
-                
-                const left = pointRect.left - containerRect.left + pointRect.width / 2;
-                const top = pointRect.top - containerRect.top + pointRect.height / 2;
-                
-                // Move the dot
-                chainDot.style.left = left + 'px';
-                chainDot.style.top = top + 'px';
-                
-                // Move to next step
-                currentStep = (currentStep + 1) % chainPoints.length;
-                
-                // Continue animation
-                setTimeout(animateChain, 1000);
-            }
+                // Move to next point
+                currentActive = (currentActive + 1) % chainPoints.length;
+            }, 2000); // Change every 2 seconds
             
-            // Start animation
-            setTimeout(animateChain, 500);
+            // Check if dashboard.html exists
+            const dashboardBtn = document.getElementById('dashboardBtn');
+            
+            fetch('dashboard.html')
+                .then(response => {
+                    if (response.ok) {
+                        console.log("✅ SUCCESS: dashboard.html is accessible");
+                        dashboardBtn.innerHTML = '<i class="fas fa-rocket"></i> Launch Live Dashboard';
+                        dashboardBtn.style.background = "linear-gradient(135deg, #26d0ce, #1a2980)";
+                        
+                        // Add click event to verify it works
+                        dashboardBtn.addEventListener('click', function(e) {
+                            console.log("🎯 Dashboard button clicked!");
+                            console.log("🔗 Will navigate to: dashboard.html");
+                            // Let the normal link behavior happen
+                        });
+                    } else {
+                        console.error("❌ ERROR: dashboard.html not found!");
+                        dashboardBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error: dashboard.html missing';
+                        dashboardBtn.style.background = "#dc2626";
+                        dashboardBtn.onclick = function(e) {
+                            e.preventDefault();
+                            alert("Error: dashboard.html file is missing!\n\nPlease make sure:\n1. dashboard.html is in the same folder as index.html\n2. The file is named exactly 'dashboard.html'");
+                        };
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ NETWORK ERROR:", error);
+                    dashboardBtn.innerHTML = '<i class="fas fa-wifi-slash"></i> Network Error';
+                    dashboardBtn.style.background = "#f59e0b";
+                });
             
             // Demo form submission
             document.getElementById('demoRequestForm').addEventListener('submit', function(e) {
@@ -317,6 +899,54 @@
                 this.reset();
             });
         });
+        
+        // Debug function to check all files
+        function checkFiles() {
+            console.log("🔍 Checking all files...");
+            
+            const files = [
+                'index.html',
+                'dashboard.html',
+                'dashboard.css',
+                'dashboard.js',
+                'style.css',
+                'script.js',
+                'manifest.json'
+            ];
+            
+            let message = "📁 File Status Check:\n\n";
+            
+            files.forEach(file => {
+                fetch(file)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`✅ ${file} - FOUND`);
+                            message += `✅ ${file} - FOUND\n`;
+                        } else {
+                            console.error(`❌ ${file} - MISSING (Status: ${response.status})`);
+                            message += `❌ ${file} - MISSING\n`;
+                        }
+                        
+                        // Show alert after all checks
+                        if (file === files[files.length - 1]) {
+                            setTimeout(() => {
+                                alert(message + "\n\nDashboard should work if:\n✅ index.html exists\n✅ dashboard.html exists\n✅ Both in same folder");
+                            }, 500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`❌ ${file} - ERROR:`, error);
+                        message += `❌ ${file} - ERROR\n`;
+                    });
+            });
+        }
+        
+        // Auto-check on page load
+        window.onload = function() {
+            console.log("🌐 Page fully loaded");
+            // Uncomment to auto-check on load
+            // checkFiles();
+        };
     </script>
 </body>
 </html>
