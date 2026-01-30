@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryoChain | Live Vessel Tracking Dashboard</title>
+    <title>CryoChain | Container Intelligence Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -12,709 +12,344 @@
 <body class="dashboard-page">
     <!-- ===== DASHBOARD HEADER ===== -->
     <header class="dashboard-header">
-        <nav>
+        <div class="header-top">
             <div class="logo">
                 <i class="fas fa-snowflake logo-icon"></i>
                 <span>CryoChain</span>
-                <span class="badge-live pulse-animation">
-                    <i class="fas fa-circle"></i> LIVE VESSEL TRACKING
-                </span>
+                <span class="badge-beta">BETA</span>
             </div>
             
-            <div class="header-controls">
-                <div class="time-display">
-                    <i class="fas fa-clock"></i>
-                    <span id="currentTime">Loading...</span>
+            <div class="header-actions">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search container, BL, or shipment..." id="globalSearch">
                 </div>
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user-circle"></i>
+                
+                <div class="user-profile">
+                    <div class="notification-badge">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge-count">3</span>
                     </div>
-                    <div class="user-details">
-                        <span class="user-name">Global Exports Inc.</span>
-                        <span class="user-role">Marine Client</span>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">Global Exports Inc.</span>
+                            <span class="user-plan">Enterprise Plan</span>
+                        </div>
                     </div>
-                    <button class="btn-icon" title="Settings">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                </div>
-            </div>
-        </nav>
-        
-        <div class="dashboard-subnav">
-            <div class="company-info">
-                <h1><i class="fas fa-satellite-dish"></i> Live Vessel & Container Intelligence</h1>
-                <p>Real-time AIS tracking integrated with Marine Traffic data</p>
-            </div>
-            
-            <div class="dashboard-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Active Vessels</span>
-                    <span class="stat-value" id="activeVessels">8</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">In Transit</span>
-                    <span class="stat-value" id="inTransit">6</span>
-                </div>
-                <div class="stat-item warning">
-                    <span class="stat-label">Delayed</span>
-                    <span class="stat-value" id="delayedVessels">2</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">ETA Today</span>
-                    <span class="stat-value" id="etaToday">3</span>
                 </div>
             </div>
         </div>
-    </header>
- 
-    <!-- ===== DASHBOARD LAYOUT ===== -->
-    <div class="dashboard-container">
-        <!-- ===== SIDEBAR ===== -->
-        <aside class="dashboard-sidebar">
-            <nav class="sidebar-nav">
+        
+        <nav class="dashboard-nav">
+            <div class="nav-left">
                 <a href="#" class="nav-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
                     <i class="fas fa-ship"></i>
-                    <span>Vessel Tracking</span>
-                    <span class="nav-badge">8</span>
+                    <span>Vessels</span>
                 </a>
                 <a href="#" class="nav-item">
-                    <i class="fas fa-thermometer-half"></i>
-                    <span>Temperature Monitoring</span>
-                    <span class="nav-badge warning">2</span>
+                    <i class="fas fa-box"></i>
+                    <span>Containers</span>
+                    <span class="nav-badge">24</span>
                 </a>
                 <a href="#" class="nav-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Schedule & ETAs</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-file-contract"></i>
+                    <i class="fas fa-file-alt"></i>
                     <span>Documents</span>
-                    <span class="nav-badge">12</span>
+                    <span class="nav-badge">48</span>
                 </a>
                 <a href="#" class="nav-item">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Delays & Alerts</span>
-                    <span class="nav-badge alert">3</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-chart-bar"></i>
+                    <i class="fas fa-chart-line"></i>
                     <span>Analytics</span>
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-satellite"></i>
-                    <span>Marine Traffic</span>
-                </a>
-            </nav>
+            </div>
             
-            <div class="sidebar-footer">
-                <div class="system-status">
-                    <div class="status-indicator online pulse-animation"></div>
-                    <span>AIS Data: Live</span>
+            <div class="nav-right">
+                <button class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> New Shipment
+                </button>
+                <button class="btn btn-secondary btn-sm">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </nav>
+    </header>
+ 
+    <!-- ===== MAIN DASHBOARD LAYOUT ===== -->
+    <div class="dashboard-container">
+        <!-- ===== QUICK STATS OVERVIEW ===== -->
+        <section class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-box"></i>
                 </div>
-                <div class="last-updated">
-                    <i class="fas fa-sync-alt fa-spin"></i>
-                    <span id="aisUpdate">Updating AIS...</span>
-                </div>
-                <div class="marine-traffic-badge">
-                    <i class="fas fa-satellite"></i>
-                    <span>Marine Traffic Integrated</span>
+                <div class="stat-content">
+                    <div class="stat-value">24</div>
+                    <div class="stat-label">Active Containers</div>
                 </div>
             </div>
-        </aside>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-ship"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">8</div>
+                    <div class="stat-label">Active Vessels</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-temperature-low"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">22</div>
+                    <div class="stat-label">Temp OK</div>
+                    <div class="stat-sub">2 Alerts</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">On Schedule</div>
+                    <div class="stat-sub">6 Delayed</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-file-check"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value">92%</div>
+                    <div class="stat-label">Docs Complete</div>
+                </div>
+            </div>
+        </section>
  
-        <!-- ===== MAIN DASHBOARD CONTENT ===== -->
-        <main class="dashboard-content">
-            <!-- ===== ANIMATED VESSEL TRACKING MAP ===== -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-map-marked-alt"></i> Live Vessel Tracking</h2>
-                    <div class="map-controls">
-                        <button class="btn-map-control active" data-layer="vessels">
-                            <i class="fas fa-ship"></i> Vessels
-                        </button>
-                        <button class="btn-map-control" data-layer="routes">
-                            <i class="fas fa-route"></i> Routes
-                        </button>
-                        <button class="btn-map-control" data-layer="ports">
-                            <i class="fas fa-anchor"></i> Ports
-                        </button>
-                        <button class="btn btn-secondary btn-sm" id="refreshMap">
-                            <i class="fas fa-redo"></i> Refresh
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="map-container">
-                    <div id="vesselMap"></div>
-                    
-                    <!-- Marine Traffic Integration Badge -->
-                    <div class="marine-traffic-banner">
-                        <img src="https://www.marinetraffic.com/img/logo_blue.png" alt="Marine Traffic" height="20">
-                        <span>AIS Data Integrated</span>
-                    </div>
-                    
-                    <!-- Map Legend -->
-                    <div class="map-legend">
-                        <h4><i class="fas fa-key"></i> Vessel Status</h4>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #10b981;"></span>
-                            <span>On Schedule</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #f59e0b;"></span>
-                            <span>Delayed (Hover for details)</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #3b82f6;"></span>
-                            <span>In Transit</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color" style="background-color: #8b5cf6;"></span>
-                            <span>At Port</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Vessel Speed Controls -->
-                    <div class="speed-controls">
-                        <h4><i class="fas fa-tachometer-alt"></i> Simulation Speed</h4>
-                        <div class="speed-slider">
-                            <input type="range" min="1" max="10" value="5" class="slider" id="speedControl">
-                            <div class="speed-labels">
-                                <span>Slow</span>
-                                <span>Real-time</span>
-                                <span>Fast</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Vessel Information Panel -->
-                <div class="vessel-info-panel">
-                    <div class="vessel-card active" data-vessel="maersk-honam">
-                        <div class="vessel-header">
-                            <div class="vessel-name">
-                                <i class="fas fa-ship"></i>
-                                <strong>MAERSK HONAM</strong>
-                            </div>
-                            <div class="vessel-status delayed">
-                                <i class="fas fa-clock"></i>
-                                DELAYED
-                            </div>
-                        </div>
-                        <div class="vessel-details">
-                            <div class="detail">
-                                <span class="label">MMSI:</span>
-                                <span class="value">477542100</span>
-                            </div>
-                            <div class="detail">
-                                <span class="label">Position:</span>
-                                <span class="value">12°34'N, 45°67'E</span>
-                            </div>
-                            <div class="detail">
-                                <span class="label">Speed:</span>
-                                <span class="value">18.5 knots</span>
-                            </div>
-                            <div class="detail">
-                                <span class="label">Course:</span>
-                                <span class="value">245°</span>
-                            </div>
-                        </div>
-                        <div class="delay-info" onclick="showDelayDetails('maersk-honam')">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span class="delay-reason">Weather delay - Click for agent notes</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="vessel-card" data-vessel="msc-gulsun">
-                        <div class="vessel-header">
-                            <div class="vessel-name">
-                                <i class="fas fa-ship"></i>
-                                <strong>MSC GÜLSUN</strong>
-                            </div>
-                            <div class="vessel-status ontime">
-                                <i class="fas fa-check-circle"></i>
-                                ON TIME
-                            </div>
-                        </div>
-                        <div class="vessel-details">
-                            <div class="detail">
-                                <span class="label">MMSI:</span>
-                                <span class="value">477542200</span>
-                            </div>
-                            <div class="detail">
-                                <span class="label">Position:</span>
-                                <span class="value">23°45'N, 56°78'E</span>
-                            </div>
-                            <div class="detail">
-                                <span class="label">Speed:</span>
-                                <span class="value">22.3 knots</span>
-                            </div>
-                            <div class="detail">
-                                <span class="label">Course:</span>
-                                <span class="value">180°</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
- 
-            <!-- ===== TEMPERATURE MONITORING + DELAY DETAILS ===== -->
-            <div class="columns-2">
-                <!-- Temperature Monitoring -->
-                <section class="dashboard-section">
+        <!-- ===== MAIN CONTENT AREA ===== -->
+        <div class="main-content">
+            <!-- LEFT COLUMN: VESSEL MAP & SELECTION -->
+            <div class="content-left">
+                <!-- Vessel Tracking Map -->
+                <div class="dashboard-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-thermometer-half"></i> Container Temperature Monitoring</h2>
-                        <button class="btn btn-secondary btn-sm" id="viewAllTemp">
-                            <i class="fas fa-expand"></i> View All
-                        </button>
-                    </div>
-                    
-                    <div class="temperature-grid">
-                        <div class="temp-card normal">
-                            <div class="temp-header">
-                                <div class="container-id">MSCU1234567</div>
-                                <div class="temp-value">2.8°C</div>
-                            </div>
-                            <div class="temp-details">
-                                <div class="detail">
-                                    <span class="label">Product:</span>
-                                    <span class="value">Fresh Berries</span>
-                                </div>
-                                <div class="detail">
-                                    <span class="label">Vessel:</span>
-                                    <span class="value">MAERSK HONAM</span>
-                                </div>
-                                <div class="progress-container">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 85%"></div>
-                                    </div>
-                                    <div class="progress-text">85% of journey complete</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="temp-card alert">
-                            <div class="temp-header">
-                                <div class="container-id">CMAU9876543</div>
-                                <div class="temp-value">-18.5°C ⚠️</div>
-                            </div>
-                            <div class="temp-details">
-                                <div class="detail">
-                                    <span class="label">Product:</span>
-                                    <span class="value">Atlantic Salmon</span>
-                                </div>
-                                <div class="detail">
-                                    <span class="label">Vessel:</span>
-                                    <span class="value">MSC GÜLSUN</span>
-                                </div>
-                                <div class="alert-message">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    Temperature rising - check refrigeration
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="temperature-chart">
-                        <canvas id="tempChart"></canvas>
-                    </div>
-                </section>
- 
-                <!-- Delay Details & Agent Notes -->
-                <section class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-clock"></i> Delay Details & Agent Notes</h2>
-                        <button class="btn btn-secondary btn-sm" id="addNote">
-                            <i class="fas fa-plus"></i> Add Note
-                        </button>
-                    </div>
-                    
-                    <div class="delay-details active">
-                        <div class="delay-header">
-                            <div class="delay-title">
-                                <i class="fas fa-ship"></i>
-                                <h3>MAERSK HONAM - Current Delay</h3>
-                            </div>
-                            <div class="delay-time">
-                                <i class="fas fa-clock"></i>
-                                <span>Delay: 36 hours</span>
-                            </div>
-                        </div>
-                        
-                        <div class="delay-timeline">
-                            <div class="timeline-item">
-                                <div class="timeline-time">Jan 28, 08:00</div>
-                                <div class="timeline-content">
-                                    <div class="timeline-title">Departure from Singapore</div>
-                                    <div class="timeline-desc">Vessel departed as scheduled</div>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item delayed">
-                                <div class="timeline-time">Jan 29, 14:30</div>
-                                <div class="timeline-content">
-                                    <div class="timeline-title">Weather Delay Initiated</div>
-                                    <div class="timeline-desc">Storm system detected in South China Sea</div>
-                                    <div class="agent-notes">
-                                        <strong>Agent Notes:</strong> "Captain reducing speed to 12 knots for safety. Expected to clear storm by 1800 UTC."
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-time">Jan 30, 09:00</div>
-                                <div class="timeline-content">
-                                    <div class="timeline-title">Route Adjustment</div>
-                                    <div class="timeline-desc">Diverted 50NM south to avoid heavy weather</div>
-                                    <div class="agent-notes">
-                                        <strong>Port Agent (Singapore):</strong> "Local port authority advising all vessels to take southern route. Additional 24-hour delay expected."
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="timeline-item">
-                                <div class="timeline-time">Now</div>
-                                <div class="timeline-content">
-                                    <div class="timeline-title">Current Status</div>
-                                    <div class="timeline-desc">Vessel making 18.5 knots on adjusted route</div>
-                                    <div class="eta-update">
-                                        <i class="fas fa-calendar-check"></i>
-                                        <strong>Revised ETA:</strong> Feb 3, 2024 (36 hours delay)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="impact-analysis">
-                            <h4><i class="fas fa-chart-line"></i> Impact Analysis</h4>
-                            <div class="impact-grid">
-                                <div class="impact-item">
-                                    <div class="impact-label">Berthing Window</div>
-                                    <div class="impact-value high-risk">Missed</div>
-                                </div>
-                                <div class="impact-item">
-                                    <div class="impact-label">Cold Storage</div>
-                                    <div class="impact-value medium-risk">Extended 36h</div>
-                                </div>
-                                <div class="impact-item">
-                                    <div class="impact-label">Customs Clearance</div>
-                                    <div class="impact-value">Rescheduled</div>
-                                </div>
-                                <div class="impact-item">
-                                    <div class="impact-label">Additional Costs</div>
-                                    <div class="impact-value">$12,500</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Agent Communication -->
-                    <div class="agent-communication">
-                        <h4><i class="fas fa-comments"></i> Agent Communication</h4>
-                        <div class="message-list">
-                            <div class="message agent">
-                                <div class="message-header">
-                                    <span class="sender">Port Agent - Singapore</span>
-                                    <span class="time">2 hours ago</span>
-                                </div>
-                                <div class="message-content">
-                                    "We've arranged priority berthing upon arrival. Additional port fees waived due to weather delay."
-                                </div>
-                            </div>
-                            <div class="message client">
-                                <div class="message-header">
-                                    <span class="sender">Your Team</span>
-                                    <span class="time">1 hour ago</span>
-                                </div>
-                                <div class="message-content">
-                                    "Please ensure reefers have sufficient power for extended stay. Send generator status report."
-                                </div>
-                            </div>
-                        </div>
-                        <div class="message-input">
-                            <input type="text" placeholder="Type message to agent...">
-                            <button class="btn btn-primary btn-sm">
-                                <i class="fas fa-paper-plane"></i>
+                        <h2><i class="fas fa-map-marked-alt"></i> Live Vessel Tracking</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary btn-sm" id="refreshVessels">
+                                <i class="fas fa-sync-alt"></i>
                             </button>
                         </div>
                     </div>
-                </section>
-            </div>
- 
-            <!-- ===== VESSEL SCHEDULE & DOCUMENTS ===== -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-calendar-alt"></i> Vessel Schedule & Documents</h2>
-                    <div class="section-actions">
-                        <button class="btn btn-primary" id="downloadDocs">
-                            <i class="fas fa-download"></i> Download All
-                        </button>
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-print"></i> Print Schedule
-                        </button>
+                    
+                    <div class="map-container">
+                        <div id="vesselMap"></div>
+                        <div class="map-controls">
+                            <div class="control-group">
+                                <label><i class="fas fa-filter"></i> Filter:</label>
+                                <select id="vesselFilter">
+                                    <option value="all">All Vessels</option>
+                                    <option value="delayed">Delayed Only</option>
+                                    <option value="my">My Containers</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vessel Quick List -->
+                    <div class="vessel-list">
+                        <h3><i class="fas fa-list"></i> Active Vessels</h3>
+                        <div class="vessel-cards" id="vesselCards">
+                            <!-- Vessel cards will be populated by JavaScript -->
+                        </div>
                     </div>
                 </div>
                 
-                <div class="schedule-table-container">
-                    <table class="schedule-table">
-                        <thead>
-                            <tr>
-                                <th>Vessel</th>
-                                <th>Voyage</th>
-                                <th>Origin</th>
-                                <th>Destination</th>
-                                <th>Original ETA</th>
-                                <th>Revised ETA</th>
-                                <th>Status</th>
-                                <th>Documents</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="delayed-row">
-                                <td>
-                                    <div class="vessel-info">
-                                        <i class="fas fa-ship"></i>
-                                        <div>
-                                            <strong>MAERSK HONAM</strong>
-                                            <small>IMO: 9756897</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>123E</td>
-                                <td>SINGAPORE</td>
-                                <td>ROTTERDAM</td>
-                                <td>Feb 2, 08:00</td>
-                                <td>
-                                    <strong>Feb 3, 20:00</strong>
-                                    <div class="delay-badge">+36h</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-delayed" 
-                                          onmouseover="showTooltip('weather-delay')"
-                                          onmouseout="hideTooltip()">
-                                        DELAYED
-                                    </span>
-                                    <div class="tooltip" id="weather-delay">
-                                        <strong>Weather Delay</strong><br>
-                                        Storm in South China Sea<br>
-                                        Captain's report available
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="doc-icons">
-                                        <span class="doc-icon complete" title="Bill of Lading">
-                                            <i class="fas fa-file-invoice"></i>
-                                        </span>
-                                        <span class="doc-icon pending" title="Customs Declaration">
-                                            <i class="fas fa-passport"></i>
-                                        </span>
-                                        <span class="doc-icon complete" title="Manifest">
-                                            <i class="fas fa-clipboard-list"></i>
-                                        </span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="Track">
-                                            <i class="fas fa-satellite"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Documents">
-                                            <i class="fas fa-folder-open"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Notify Agent">
-                                            <i class="fas fa-comment-medical"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td>
-                                    <div class="vessel-info">
-                                        <i class="fas fa-ship"></i>
-                                        <div>
-                                            <strong>MSC GÜLSUN</strong>
-                                            <small>IMO: 9854321</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>456W</td>
-                                <td>SHANGHAI</td>
-                                <td>LONG BEACH</td>
-                                <td>Feb 5, 14:00</td>
-                                <td>
-                                    <strong>Feb 5, 14:00</strong>
-                                    <div class="ontime-badge">ON TIME</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-ontime">ON SCHEDULE</span>
-                                </td>
-                                <td>
-                                    <div class="doc-icons">
-                                        <span class="doc-icon complete" title="All documents complete">
-                                            <i class="fas fa-check-circle"></i>
-                                        </span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="Track">
-                                            <i class="fas fa-satellite"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Documents">
-                                            <i class="fas fa-folder-open"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr class="delayed-row">
-                                <td>
-                                    <div class="vessel-info">
-                                        <i class="fas fa-ship"></i>
-                                        <div>
-                                            <strong>CMA CGM MARCO POLO</strong>
-                                            <small>IMO: 9456789</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>789S</td>
-                                <td>ROTTERDAM</td>
-                                <td>COLOMBO</td>
-                                <td>Jan 31, 10:00</td>
-                                <td>
-                                    <strong>Feb 1, 16:00</strong>
-                                    <div class="delay-badge">+30h</div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-delayed"
-                                          onmouseover="showTooltip('port-congestion')"
-                                          onmouseout="hideTooltip()">
-                                        DELAYED
-                                    </span>
-                                    <div class="tooltip" id="port-congestion">
-                                        <strong>Port Congestion</strong><br>
-                                        Rotterdam port backlog<br>
-                                        Agent working on priority berthing
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="doc-icons">
-                                        <span class="doc-icon complete" title="Bill of Lading">
-                                            <i class="fas fa-file-invoice"></i>
-                                        </span>
-                                        <span class="doc-icon missing" title="Health Certificate">
-                                            <i class="fas fa-file-medical"></i>
-                                        </span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="Track">
-                                            <i class="fas fa-satellite"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Urgent">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Container Timeline Visualization -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-project-diagram"></i> Container Journey Timeline</h2>
+                        <button class="btn btn-secondary btn-sm" id="timelineHelp">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="timeline-visualization" id="journeyTimeline">
+                        <!-- Timeline will be populated by JavaScript -->
+                    </div>
                 </div>
-            </section>
- 
-            <!-- ===== QUICK ACTIONS ===== -->
-            <section class="dashboard-section quick-actions">
-                <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
-                <div class="actions-grid">
-                    <button class="action-card" data-action="track-vessel">
-                        <i class="fas fa-satellite-dish"></i>
-                        <span>Track New Vessel</span>
-                    </button>
-                    <button class="action-card" data-action="marine-traffic">
-                        <i class="fas fa-satellite"></i>
-                        <span>Marine Traffic API</span>
-                    </button>
-                    <button class="action-card" data-action="delay-report">
-                        <i class="fas fa-file-contract"></i>
-                        <span>Delay Report</span>
-                    </button>
-                    <button class="action-card" data-action="agent-contact">
-                        <i class="fas fa-headset"></i>
-                        <span>Contact Agent</span>
-                    </button>
-                    <button class="action-card" data-action="weather-check">
-                        <i class="fas fa-cloud-sun-rain"></i>
-                        <span>Weather Routing</span>
-                    </button>
-                    <button class="action-card" data-action="export">
-                        <i class="fas fa-file-export"></i>
-                        <span>Export Data</span>
-                    </button>
-                </div>
-            </section>
-        </main>
-    </div>
- 
-    <!-- ===== MODAL FOR DELAY DETAILS ===== -->
-    <div class="modal" id="delayModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-clock"></i> Detailed Delay Information</h3>
-                <button class="modal-close" id="closeModal">&times;</button>
             </div>
-            <div class="modal-body" id="delayModalBody">
-                <!-- Content will be loaded dynamically -->
+            
+            <!-- RIGHT COLUMN: CONTAINER DETAILS & DOCUMENTS -->
+            <div class="content-right">
+                <!-- Selected Container Details -->
+                <div class="dashboard-section" id="containerDetailsSection">
+                    <div class="section-header">
+                        <h2><i class="fas fa-box-open"></i> Container Details</h2>
+                        <span class="section-subtitle">Select a container to view details</span>
+                    </div>
+                    
+                    <div class="container-details-placeholder">
+                        <div class="placeholder-content">
+                            <i class="fas fa-box fa-3x"></i>
+                            <h3>No Container Selected</h3>
+                            <p>Click on a container from the vessel view or search to view details</p>
+                            <button class="btn btn-secondary" id="quickSearchBtn">
+                                <i class="fas fa-search"></i> Quick Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documents Quick View -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-folder"></i> Recent Documents</h2>
+                        <button class="btn btn-secondary btn-sm" id="viewAllDocs">
+                            View All
+                        </button>
+                    </div>
+                    
+                    <div class="documents-grid" id="documentsGrid">
+                        <!-- Documents will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="dashboard-section">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    <div class="quick-actions-grid">
+                        <button class="action-btn" data-action="upload-doc">
+                            <i class="fas fa-file-upload"></i>
+                            <span>Upload Document</span>
+                        </button>
+                        <button class="action-btn" data-action="add-note">
+                            <i class="fas fa-sticky-note"></i>
+                            <span>Add Note</span>
+                        </button>
+                        <button class="action-btn" data-action="track-shipment">
+                            <i class="fas fa-satellite"></i>
+                            <span>Track Shipment</span>
+                        </button>
+                        <button class="action-btn" data-action="generate-report">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Generate Report</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
  
-    <!-- ===== MARINE TRAFFIC INTEGRATION MODAL ===== -->
-    <div class="modal" id="marineTrafficModal">
-        <div class="modal-content wide-modal">
+    <!-- ===== VESSEL MODAL (Opens when vessel is clicked) ===== -->
+    <div class="modal" id="vesselModal">
+        <div class="modal-content modal-large">
             <div class="modal-header">
-                <h3><i class="fas fa-satellite"></i> Marine Traffic Integration</h3>
-                <button class="modal-close" id="closeMarineModal">&times;</button>
+                <h3><i class="fas fa-ship"></i> <span id="vesselModalTitle">Vessel Details</span></h3>
+                <button class="modal-close" id="closeVesselModal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="marine-info">
-                    <div class="marine-logo">
-                        <img src="https://www.marinetraffic.com/img/logo_blue.png" alt="Marine Traffic" height="40">
+                <div class="vessel-modal-content">
+                    <!-- Content loaded by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- ===== CONTAINER DETAIL MODAL ===== -->
+    <div class="modal" id="containerModal">
+        <div class="modal-content modal-extra-large">
+            <div class="modal-header">
+                <h3><i class="fas fa-box"></i> <span id="containerModalTitle">Container Details</span></h3>
+                <button class="modal-close" id="closeContainerModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="container-modal-content">
+                    <!-- Content loaded by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- ===== DOCUMENT VIEWER MODAL ===== -->
+    <div class="modal" id="documentModal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> <span id="documentModalTitle">Document Viewer</span></h3>
+                <button class="modal-close" id="closeDocumentModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="document-viewer" id="documentViewer">
+                    <!-- Document content loaded by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- ===== MESSAGE COMPOSER MODAL ===== -->
+    <div class="modal" id="messageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-comment-medical"></i> Send Message</h3>
+                <button class="modal-close" id="closeMessageModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="message-composer">
+                    <div class="form-group">
+                        <label>To:</label>
+                        <select id="messageRecipient">
+                            <option value="">Select Recipient</option>
+                            <option value="shipping-agent">Shipping Agent</option>
+                            <option value="port-agent">Port Agent</option>
+                            <option value="carrier">Carrier Representative</option>
+                            <option value="customs">Customs Broker</option>
+                            <option value="consignee">Consignee</option>
+                        </select>
                     </div>
-                    <div class="marine-details">
-                        <h4>Real-time AIS Data Integration</h4>
-                        <p>Powered by Marine Traffic API for live vessel positions, speeds, and routes.</p>
-                        
-                        <div class="api-features">
-                            <div class="feature">
-                                <i class="fas fa-ship"></i>
-                                <span>Live Vessel Positions</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-route"></i>
-                                <span>Historical Tracks</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-anchor"></i>
-                                <span>Port Calls & ETAs</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-database"></i>
-                                <span>Vessel Database</span>
-                            </div>
+                    <div class="form-group">
+                        <label>Subject:</label>
+                        <input type="text" id="messageSubject" placeholder="Regarding container/shipment...">
+                    </div>
+                    <div class="form-group">
+                        <label>Message:</label>
+                        <textarea id="messageContent" rows="6" placeholder="Type your message..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority:</label>
+                        <div class="priority-selector">
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="normal" checked>
+                                <span class="priority-label normal">Normal</span>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="urgent">
+                                <span class="priority-label urgent">Urgent</span>
+                            </label>
+                            <label class="priority-option">
+                                <input type="radio" name="priority" value="critical">
+                                <span class="priority-label critical">Critical</span>
+                            </label>
                         </div>
-                        
-                        <div class="api-key">
-                            <label>API Key Status:</label>
-                            <div class="key-status active">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Active (Demo Mode)</span>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Attach Document:</label>
+                        <input type="file" id="messageAttachment">
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="cancelMessage">Cancel</button>
+                        <button class="btn btn-primary" id="sendMessage">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
                     </div>
                 </div>
             </div>
