@@ -16,17 +16,17 @@
             <div class="logo">
                 <i class="fas fa-snowflake logo-icon"></i>
                 <span>CryoChain</span>
-                <span class="badge-beta">BETA</span>
+                <span class="badge-beta">PRO</span>
             </div>
             
             <div class="header-actions">
                 <div class="search-container">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search container, BL, or shipment..." id="globalSearch">
+                    <input type="text" placeholder="Search container, BL, client ref..." id="globalSearch">
                 </div>
                 
                 <div class="user-profile">
-                    <div class="notification-badge">
+                    <div class="notification-badge" id="notificationBtn">
                         <i class="fas fa-bell"></i>
                         <span class="badge-count">3</span>
                     </div>
@@ -45,35 +45,25 @@
         
         <nav class="dashboard-nav">
             <div class="nav-left">
-                <a href="#" class="nav-item active">
+                <a href="#" class="nav-item active" data-view="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-ship"></i>
-                    <span>Vessels</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-box"></i>
-                    <span>Containers</span>
-                    <span class="nav-badge">24</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Documents</span>
-                    <span class="nav-badge">48</span>
-                </a>
-                <a href="#" class="nav-item">
+                <a href="#" class="nav-item" data-view="analytics">
                     <i class="fas fa-chart-line"></i>
                     <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item" data-view="reports">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
                 </a>
             </div>
             
             <div class="nav-right">
-                <button class="btn btn-primary btn-sm">
+                <button class="btn btn-primary btn-sm" id="newShipmentBtn">
                     <i class="fas fa-plus"></i> New Shipment
                 </button>
-                <button class="btn btn-secondary btn-sm">
+                <button class="btn btn-secondary btn-sm" id="exportData">
                     <i class="fas fa-download"></i> Export
                 </button>
             </div>
@@ -82,66 +72,99 @@
  
     <!-- ===== MAIN DASHBOARD LAYOUT ===== -->
     <div class="dashboard-container">
-        <!-- ===== QUICK STATS OVERVIEW ===== -->
+        <!-- ===== STATS OVERVIEW WITH SUMMARY VIEWS ===== -->
         <section class="stats-overview">
-            <div class="stat-card">
+            <div class="stat-card" data-filter="active-containers" data-summary="containers">
                 <div class="stat-icon">
                     <i class="fas fa-box"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-value">24</div>
                     <div class="stat-label">Active Containers</div>
+                    <div class="stat-sub">8 Clients • 12 Products</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" data-filter="active-vessels" data-summary="vessels">
                 <div class="stat-icon">
                     <i class="fas fa-ship"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-value">8</div>
                     <div class="stat-label">Active Vessels</div>
+                    <div class="stat-sub">3 Delayed • 5 On Time</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" data-filter="temp-ok" data-summary="temperature">
                 <div class="stat-icon">
                     <i class="fas fa-temperature-low"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-value">22</div>
                     <div class="stat-label">Temp OK</div>
-                    <div class="stat-sub">2 Alerts</div>
+                    <div class="stat-sub">2 Alerts • 0 Critical</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" data-filter="on-schedule" data-summary="schedule">
                 <div class="stat-icon">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-value">18</div>
                     <div class="stat-label">On Schedule</div>
-                    <div class="stat-sub">6 Delayed</div>
+                    <div class="stat-sub">6 Delayed • 92% OTIF</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" data-filter="docs-complete" data-summary="documents">
                 <div class="stat-icon">
                     <i class="fas fa-file-check"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-value">92%</div>
                     <div class="stat-label">Docs Complete</div>
+                    <div class="stat-sub">144/156 Documents</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-chevron-right"></i>
                 </div>
             </div>
         </section>
  
+        <!-- ===== SUMMARY MODAL (Opens when stats are clicked) ===== -->
+        <div class="modal" id="summaryModal">
+            <div class="modal-content modal-extra-large">
+                <div class="modal-header">
+                    <h3><i class="fas fa-list"></i> <span id="summaryTitle">Summary Details</span></h3>
+                    <button class="modal-close" id="closeSummaryModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="summary-content" id="summaryContent">
+                        <!-- Content loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+ 
         <!-- ===== MAIN CONTENT AREA ===== -->
         <div class="main-content">
-            <!-- LEFT COLUMN: VESSEL MAP & SELECTION -->
+            <!-- LEFT COLUMN: MAP & VESSELS -->
             <div class="content-left">
-                <!-- Vessel Tracking Map -->
+                <!-- Live Vessel Tracking -->
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h2><i class="fas fa-map-marked-alt"></i> Live Vessel Tracking</h2>
@@ -149,118 +172,175 @@
                             <button class="btn btn-secondary btn-sm" id="refreshVessels">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
+                            <button class="btn btn-secondary btn-sm" id="fullScreenMap">
+                                <i class="fas fa-expand"></i>
+                            </button>
                         </div>
                     </div>
                     
                     <div class="map-container">
                         <div id="vesselMap"></div>
-                        <div class="map-controls">
-                            <div class="control-group">
-                                <label><i class="fas fa-filter"></i> Filter:</label>
-                                <select id="vesselFilter">
-                                    <option value="all">All Vessels</option>
-                                    <option value="delayed">Delayed Only</option>
-                                    <option value="my">My Containers</option>
-                                </select>
+                        <div class="map-legend">
+                            <h4><i class="fas fa-key"></i> Legend</h4>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #10b981;"></span>
+                                <span>On Schedule</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #f59e0b;"></span>
+                                <span>Delayed</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #ef4444;"></span>
+                                <span>Critical</span>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Vessel Quick List -->
-                    <div class="vessel-list">
-                        <h3><i class="fas fa-list"></i> Active Vessels</h3>
-                        <div class="vessel-cards" id="vesselCards">
-                            <!-- Vessel cards will be populated by JavaScript -->
+                    <!-- Vessel Quick Stats -->
+                    <div class="vessel-stats">
+                        <div class="vessel-stat">
+                            <span class="stat-label">Active Voyages</span>
+                            <span class="stat-value">8</span>
+                        </div>
+                        <div class="vessel-stat">
+                            <span class="stat-label">Average Speed</span>
+                            <span class="stat-value">18.5 kts</span>
+                        </div>
+                        <div class="vessel-stat">
+                            <span class="stat-label">Nearest ETA</span>
+                            <span class="stat-value">2 days</span>
+                        </div>
+                        <div class="vessel-stat">
+                            <span class="stat-label">Total TEU</span>
+                            <span class="stat-value">12,450</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Container Timeline Visualization -->
+                <!-- Client Load Reference Summary -->
                 <div class="dashboard-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-project-diagram"></i> Container Journey Timeline</h2>
-                        <button class="btn btn-secondary btn-sm" id="timelineHelp">
-                            <i class="fas fa-question-circle"></i>
+                        <h2><i class="fas fa-users"></i> Client Load References</h2>
+                        <button class="btn btn-secondary btn-sm" id="viewAllClients">
+                            View All
                         </button>
                     </div>
                     
-                    <div class="timeline-visualization" id="journeyTimeline">
-                        <!-- Timeline will be populated by JavaScript -->
+                    <div class="client-list" id="clientList">
+                        <!-- Client cards loaded by JavaScript -->
                     </div>
                 </div>
             </div>
             
-            <!-- RIGHT COLUMN: CONTAINER DETAILS & DOCUMENTS -->
+            <!-- RIGHT COLUMN: ANALYTICS & DOCUMENTS -->
             <div class="content-right">
-                <!-- Selected Container Details -->
-                <div class="dashboard-section" id="containerDetailsSection">
+                <!-- Analytics Dashboard -->
+                <div class="dashboard-section analytics-section">
                     <div class="section-header">
-                        <h2><i class="fas fa-box-open"></i> Container Details</h2>
-                        <span class="section-subtitle">Select a container to view details</span>
+                        <h2><i class="fas fa-chart-line"></i> Market Analytics</h2>
+                        <select id="commodityFilter" class="analytics-filter">
+                            <option value="all">All Commodities</option>
+                            <option value="fruits">Fresh Fruits</option>
+                            <option value="seafood">Seafood</option>
+                            <option value="pharma">Pharmaceuticals</option>
+                            <option value="floral">Floral</option>
+                        </select>
                     </div>
                     
-                    <div class="container-details-placeholder">
-                        <div class="placeholder-content">
-                            <i class="fas fa-box fa-3x"></i>
-                            <h3>No Container Selected</h3>
-                            <p>Click on a container from the vessel view or search to view details</p>
-                            <button class="btn btn-secondary" id="quickSearchBtn">
-                                <i class="fas fa-search"></i> Quick Search
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <h4><i class="fas fa-money-bill-wave"></i> Market Prices</h4>
+                                <span class="analytics-trend positive">+3.2%</span>
+                            </div>
+                            <div class="analytics-chart" id="priceChart"></div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <h4><i class="fas fa-ship"></i> Freight Rates</h4>
+                                <span class="analytics-trend negative">-1.5%</span>
+                            </div>
+                            <div class="analytics-chart" id="freightChart"></div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <h4><i class="fas fa-thermometer-half"></i> Temperature Insights</h4>
+                                <span class="analytics-trend positive">+0.8°C avg</span>
+                            </div>
+                            <div class="analytics-chart" id="tempChart"></div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <h4><i class="fas fa-calendar-check"></i> Schedule Performance</h4>
+                                <span class="analytics-trend positive">+5% OTIF</span>
+                            </div>
+                            <div class="analytics-chart" id="scheduleChart"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documents Progress -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-file-alt"></i> Document Progress</h2>
+                        <button class="btn btn-secondary btn-sm" id="refreshDocs">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="documents-progress">
+                        <div class="progress-summary">
+                            <div class="progress-item">
+                                <div class="progress-label">Bill of Lading</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 95%"></div>
+                                </div>
+                                <div class="progress-value">95%</div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-label">Cert of Origin</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 88%"></div>
+                                </div>
+                                <div class="progress-value">88%</div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-label">Phytosanitary</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 92%"></div>
+                                </div>
+                                <div class="progress-value">92%</div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-label">Health Cert</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                                <div class="progress-value">85%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="documents-actions">
+                            <button class="btn btn-primary btn-sm" id="uploadMissing">
+                                <i class="fas fa-upload"></i> Upload Missing
+                            </button>
+                            <button class="btn btn-secondary btn-sm" id="generateReports">
+                                <i class="fas fa-file-export"></i> Generate Reports
                             </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Documents Quick View -->
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-folder"></i> Recent Documents</h2>
-                        <button class="btn btn-secondary btn-sm" id="viewAllDocs">
-                            View All
-                        </button>
+                <!-- Quick Insights -->
+                <div class="dashboard-section insights-section">
+                    <h3><i class="fas fa-lightbulb"></i> Quick Insights</h3>
+                    <div class="insights-list" id="insightsList">
+                        <!-- Insights loaded by JavaScript -->
                     </div>
-                    
-                    <div class="documents-grid" id="documentsGrid">
-                        <!-- Documents will be populated by JavaScript -->
-                    </div>
-                </div>
-                
-                <!-- Quick Actions -->
-                <div class="dashboard-section">
-                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
-                    <div class="quick-actions-grid">
-                        <button class="action-btn" data-action="upload-doc">
-                            <i class="fas fa-file-upload"></i>
-                            <span>Upload Document</span>
-                        </button>
-                        <button class="action-btn" data-action="add-note">
-                            <i class="fas fa-sticky-note"></i>
-                            <span>Add Note</span>
-                        </button>
-                        <button class="action-btn" data-action="track-shipment">
-                            <i class="fas fa-satellite"></i>
-                            <span>Track Shipment</span>
-                        </button>
-                        <button class="action-btn" data-action="generate-report">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Generate Report</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
- 
-    <!-- ===== VESSEL MODAL (Opens when vessel is clicked) ===== -->
-    <div class="modal" id="vesselModal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3><i class="fas fa-ship"></i> <span id="vesselModalTitle">Vessel Details</span></h3>
-                <button class="modal-close" id="closeVesselModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="vessel-modal-content">
-                    <!-- Content loaded by JavaScript -->
                 </div>
             </div>
         </div>
@@ -271,86 +351,71 @@
         <div class="modal-content modal-extra-large">
             <div class="modal-header">
                 <h3><i class="fas fa-box"></i> <span id="containerModalTitle">Container Details</span></h3>
-                <button class="modal-close" id="closeContainerModal">&times;</button>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary btn-sm" id="printContainer">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="shareContainer">
+                        <i class="fas fa-share"></i> Share
+                    </button>
+                    <button class="modal-close" id="closeContainerModal">&times;</button>
+                </div>
             </div>
             <div class="modal-body">
-                <div class="container-modal-content">
-                    <!-- Content loaded by JavaScript -->
+                <div class="container-modal-tabs">
+                    <button class="tab-btn active" data-tab="journey">Journey Timeline</button>
+                    <button class="tab-btn" data-tab="documents">Documents</button>
+                    <button class="tab-btn" data-tab="temperature">Temperature Log</button>
+                    <button class="tab-btn" data-tab="messages">Messages</button>
+                    <button class="tab-btn" data-tab="analytics">Market Analytics</button>
+                </div>
+                
+                <div class="tab-content active" id="journeyTab">
+                    <!-- Journey timeline content -->
+                </div>
+                
+                <div class="tab-content" id="documentsTab">
+                    <!-- Documents content -->
+                </div>
+                
+                <div class="tab-content" id="temperatureTab">
+                    <!-- Temperature content -->
+                </div>
+                
+                <div class="tab-content" id="messagesTab">
+                    <!-- Messages content -->
+                </div>
+                
+                <div class="tab-content" id="analyticsTab">
+                    <!-- Analytics content -->
                 </div>
             </div>
         </div>
     </div>
  
-    <!-- ===== DOCUMENT VIEWER MODAL ===== -->
-    <div class="modal" id="documentModal">
-        <div class="modal-content modal-wide">
-            <div class="modal-header">
-                <h3><i class="fas fa-file-alt"></i> <span id="documentModalTitle">Document Viewer</span></h3>
-                <button class="modal-close" id="closeDocumentModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="document-viewer" id="documentViewer">
-                    <!-- Document content loaded by JavaScript -->
-                </div>
-            </div>
+    <!-- ===== NOTIFICATIONS PANEL ===== -->
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="btn-icon" id="closeNotifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+            <!-- Notifications loaded by JavaScript -->
         </div>
     </div>
  
-    <!-- ===== MESSAGE COMPOSER MODAL ===== -->
-    <div class="modal" id="messageModal">
-        <div class="modal-content">
+    <!-- ===== NEW SHIPMENT MODAL ===== -->
+    <div class="modal" id="newShipmentModal">
+        <div class="modal-content modal-large">
             <div class="modal-header">
-                <h3><i class="fas fa-comment-medical"></i> Send Message</h3>
-                <button class="modal-close" id="closeMessageModal">&times;</button>
+                <h3><i class="fas fa-plus-circle"></i> Create New Shipment</h3>
+                <button class="modal-close" id="closeNewShipment">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="message-composer">
-                    <div class="form-group">
-                        <label>To:</label>
-                        <select id="messageRecipient">
-                            <option value="">Select Recipient</option>
-                            <option value="shipping-agent">Shipping Agent</option>
-                            <option value="port-agent">Port Agent</option>
-                            <option value="carrier">Carrier Representative</option>
-                            <option value="customs">Customs Broker</option>
-                            <option value="consignee">Consignee</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Subject:</label>
-                        <input type="text" id="messageSubject" placeholder="Regarding container/shipment...">
-                    </div>
-                    <div class="form-group">
-                        <label>Message:</label>
-                        <textarea id="messageContent" rows="6" placeholder="Type your message..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Priority:</label>
-                        <div class="priority-selector">
-                            <label class="priority-option">
-                                <input type="radio" name="priority" value="normal" checked>
-                                <span class="priority-label normal">Normal</span>
-                            </label>
-                            <label class="priority-option">
-                                <input type="radio" name="priority" value="urgent">
-                                <span class="priority-label urgent">Urgent</span>
-                            </label>
-                            <label class="priority-option">
-                                <input type="radio" name="priority" value="critical">
-                                <span class="priority-label critical">Critical</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Attach Document:</label>
-                        <input type="file" id="messageAttachment">
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" id="cancelMessage">Cancel</button>
-                        <button class="btn btn-primary" id="sendMessage">
-                            <i class="fas fa-paper-plane"></i> Send Message
-                        </button>
-                    </div>
+                <div class="new-shipment-form" id="newShipmentForm">
+                    <!-- Form loaded by JavaScript -->
                 </div>
             </div>
         </div>
