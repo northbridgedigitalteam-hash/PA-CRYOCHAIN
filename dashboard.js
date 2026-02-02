@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     d.status === "Available" ? "ok" : "warn",
                     d.status
                 )}</td>
-                <td><a href="${d.link}" class="download-link">Download</a></td>
+                <td>${d.link}Download</a></td>
             </tr>
         `
             )
