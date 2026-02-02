@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PA-CryoChain | Dashboard</title>
 
-    <link rel="stylesheet" href="dashboard.css" />
-    <link rel="manifest" href="manifest.json" />
+    <!-- Dashboard styles -->
+    dashboard.css
 
     <!-- Leaflet CSS for map -->
     <link
@@ -17,22 +17,20 @@
     />
 </head>
 <body class="consignment-body">
-    <!-- Top navigation -->
+    <!-- Top green bar -->
     <header class="main-header">
         <div class="header-left">
             <div class="logo-inline">
                 <span class="logo-symbol">❄️🍎🍊</span>
                 <span class="logo-title">PA-CryoChain</span>
             </div>
-
             <nav class="top-nav">
-                <button class="nav-link active" data-section="home">home</button>
-                <button class="nav-link" data-section="bookings">bookings</button>
-                <button class="nav-link" data-section="reports">reports</button>
-                <button class="nav-link" data-section="delays">delays</button>
+                <a href="#" class="nav-link active" data-view="summary">home</a>
+                <a href="#" class="nav-link" data-view="bookings">bookings</a>
+                <a href="#" class="nav-link" data-view="reports">reports</a>
+                <a href="#" class="nav-link" data-view="data">data</a>
             </nav>
         </div>
-
         <div class="header-right">
             <span id="headerYear" class="header-badge"></span>
             <span id="headerUser" class="header-user"></span>
@@ -40,477 +38,461 @@
         </div>
     </header>
 
-    <!-- Main content sections -->
-    <main class="main-sections">
-        <!-- HOME: summary + consignment detail -->
-        <section id="section-home" class="section visible">
-            <!-- Summary cards -->
-            <div class="summary-strip">
-                <div class="summary-card">
-                    <div class="summary-label">Total consignments</div>
-                    <div id="summaryTotal" class="summary-value">0</div>
+    <!-- Consignment bar (used when file view is active) -->
+    <section class="consignment-bar" id="consignmentBar">
+        <div>
+            <h1 id="consignmentTitle">Consignment</h1>
+            <p id="consignmentSub" class="consignment-sub"></p>
+        </div>
+        <div class="consignment-actions">
+            <button class="btn secondary-btn">View Consignment</button>
+            <button class="btn secondary-btn">View Itinerary</button>
+            <button class="btn secondary-btn">Make Amendment</button>
+            <button class="btn primary-btn">Save Consignment</button>
+        </div>
+    </section>
+
+    <main id="mainContent">
+        <!-- ======================== SUMMARY DASHBOARD VIEW ======================== -->
+        <section id="view-summary">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Exporter Summary Dashboard</h2>
                 </div>
-                <div class="summary-card">
-                    <div class="summary-label">On route</div>
-                    <div id="summaryOnRoute" class="summary-value">0</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-label">Awaiting docs</div>
-                    <div id="summaryAwaitingDocs" class="summary-value">0</div>
+                <div class="panel-body">
+                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
+                        Overview of consignments, vessels and shipments on route. Click on a
+                        consignment reference to open the file dashboard.
+                    </p>
                 </div>
             </div>
 
-            <!-- Consignment summary table -->
-            <section class="panel">
+            <div class="panel">
                 <div class="panel-header">
-                    <h2>Consignments Summary</h2>
+                    <h3>Consignments</h3>
                 </div>
                 <div class="panel-body">
-                    <p class="hint">
-                        Exporter view: select a consignment below to open the file dashboard with
-                        full details, map, tasks, documents and messaging.
-                    </p>
-                    <div class="table-wrapper">
-                        <table class="status-table" id="summaryTable">
-                            <thead>
-                                <tr>
-                                    <th>Consignment Ref</th>
-                                    <th>Container</th>
-                                    <th>Vessel / Voyage</th>
-                                    <th>Commodity</th>
-                                    <th>Route Status</th>
-                                    <th>PPECB</th>
-                                    <th>Phyto / eCert</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                    <table class="status-table" id="summaryConsignments">
+                        <thead>
+                            <tr>
+                                <th>Consignment Ref</th>
+                                <th>Container</th>
+                                <th>Commodity</th>
+                                <th>Market</th>
+                                <th>Status</th>
+                                <th>ETD</th>
+                                <th>ETA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
                 </div>
-            </section>
+            </div>
 
-            <!-- File dashboard (detail) -->
-            <section id="detailWrapper" class="detail-wrapper hidden">
-                <section class="consignment-bar">
-                    <div>
-                        <h1 id="consignmentTitle">Consignment</h1>
-                        <p id="consignmentSub" class="consignment-sub">
-                            Shipment overview with PPECB, DALRRD/eCert, cold chain & documents
-                        </p>
-                    </div>
-                    <div class="consignment-actions">
-                        <button class="btn secondary-btn">View Itinerary</button>
-                        <button class="btn secondary-btn">View Container History</button>
-                        <button class="btn primary-btn">Save Consignment</button>
-                    </div>
-                </section>
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Vessels</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="status-table" id="summaryVessels">
+                        <thead>
+                            <tr>
+                                <th>Vessel / Voyage</th>
+                                <th>POL</th>
+                                <th>POD</th>
+                                <th>ETD</th>
+                                <th>ETA</th>
+                                <th>Shipments On Board</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                <section class="consignment-layout">
-                    <!-- LEFT COLUMN -->
-                    <section class="left-column">
-                        <!-- Basic summary -->
-                        <div class="panel">
-                            <div class="panel-header">
-                                <h2>Consignment Summary</h2>
-                            </div>
-                            <div class="panel-body">
-                                <div class="summary-grid">
-                                    <div class="summary-block">
-                                        <table class="summary-table">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Consignee:</th>
-                                                    <td id="consignee"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Exporter:</th>
-                                                    <td id="exporter"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Notify Party:</th>
-                                                    <td id="notifyParty"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Client Ref:</th>
-                                                    <td id="clientRef"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Container No.:</th>
-                                                    <td id="containerNo"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Commodity:</th>
-                                                    <td id="commodity"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Market / Destination:</th>
-                                                    <td id="marketDest"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="summary-block">
-                                        <table class="summary-table">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Route Status:</th>
-                                                    <td id="routeStatus"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>PPECB Status:</th>
-                                                    <td id="ppecbStatus"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>DALRRD / eCert:</th>
-                                                    <td id="dalrrdStatus"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Cold Chain:</th>
-                                                    <td id="coldChainStatus"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Temperature Target:</th>
-                                                    <td id="tempTarget"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Current Avg Temp:</th>
-                                                    <td id="tempAvg"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Last Updated:</th>
-                                                    <td id="lastUpdated"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Shipments on Route</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="status-table" id="summaryShipments">
+                        <thead>
+                            <tr>
+                                <th>Consignment Ref</th>
+                                <th>Container</th>
+                                <th>Current Location</th>
+                                <th>Cold Chain</th>
+                                <th>Delay / Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                        <!-- Export notes (internal only) -->
-                        <div id="exportNotesPanel" class="panel">
-                            <div class="panel-header">
-                                <h2>Operations Notes (Internal)</h2>
-                            </div>
-                            <div class="panel-body">
-                                <textarea id="exportNotes" class="notes-box" readonly></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Task & Document status -->
-                        <div class="panel panel-split">
-                            <div class="sub-panel">
-                                <div class="panel-header">
-                                    <h3>Task Summary</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <table class="status-table" id="taskTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Task</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="sub-panel">
-                                <div class="panel-header">
-                                    <h3>Document Status</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <table class="status-table" id="docStatusTable">
-                                        <thead>
-                                            <tr>
-                                                <th>Document</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Booking & Vessel -->
-                        <div class="panel">
-                            <div class="panel-header">
-                                <h2>Booking & Vessel Summary</h2>
-                            </div>
-                            <div class="panel-body">
-                                <table class="summary-table summary-table-wide">
-                                    <tbody>
-                                        <tr>
-                                            <th>Booking Ref:</th>
-                                            <td id="bookingRef"></td>
-                                            <th>Vessel / Voyage:</th>
-                                            <td id="vesselVoyage"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Shipping Line:</th>
-                                            <td id="shippingLine"></td>
-                                            <th>Container Type:</th>
-                                            <td id="containerType"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>POL:</th>
-                                            <td id="pol"></td>
-                                            <th>POD:</th>
-                                            <td id="pod"></td>
-                                        </tr>
-                                        <tr>
-                                            <th>ETD:</th>
-                                            <td id="etd"></td>
-                                            <th>ETA:</th>
-                                            <td id="eta"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Delays for this shipment -->
-                        <div class="panel">
-                            <div class="panel-header">
-                                <h2>Delays Affecting This Shipment</h2>
-                            </div>
-                            <div class="panel-body">
-                                <table class="status-table" id="delayTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Type</th>
-                                            <th>Description</th>
-                                            <th>Source</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                                <p class="hint">
-                                    Operational delays such as port congestion, strikes or weather
-                                    can be logged here. External marine news feeds can be integrated
-                                    later (Transnet, Splash247, etc.).
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- RIGHT COLUMN -->
-                    <section class="right-column">
-                        <!-- Map -->
-                        <div class="panel">
-                            <div class="panel-header">
-                                <h2>Container Location</h2>
-                            </div>
-                            <div class="panel-body">
-                                <div id="map" class="map-container"></div>
-                                <p id="mapMeta" class="map-meta"></p>
-                                <p class="map-note">
-                                    Map uses OpenStreetMap demo data. For live positions, integrate
-                                    your container tracking or marine traffic provider.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Docs upload/download -->
-                        <div class="panel">
-                            <div class="panel-header">
-                                <h2>Consignment Documents</h2>
-                            </div>
-                            <div class="panel-body">
-                                <form id="uploadForm" class="upload-form">
-                                    <label for="docUpload" class="upload-label">Upload documents</label>
-                                    <input type="file" id="docUpload" multiple />
-                                    <button type="submit" class="btn secondary-btn">
-                                        Add to Consignment
-                                    </button>
-                                </form>
-                                <div class="table-wrapper">
-                                    <table class="status-table" id="docTable">
-                                        <thead>
-                                            <tr>
-                                                <th>File Name</th>
-                                                <th>Size</th>
-                                                <th>Type</th>
-                                                <th>Download</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                                <p class="upload-note">
-                                    On GitHub Pages, uploaded files are kept only in this browser
-                                    session for demo purposes. A backend is required for shared,
-                                    long-term storage.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Messages -->
-                        <div class="panel">
-                            <div class="panel-header">
-                                <h2>Messages on this File</h2>
-                            </div>
-                            <div class="panel-body">
-                                <ul id="messageList" class="message-list"></ul>
-                                <form id="messageForm" class="message-form">
-                                    <textarea
-                                        id="messageInput"
-                                        rows="3"
-                                        placeholder="Post a message or query about this consignment..."
-                                    ></textarea>
-                                    <button type="submit" class="btn primary-btn">
-                                        Post Message
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </section>
-                </section>
-            </section>
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Delays & Disruptions</h3>
+                </div>
+                <div class="panel-body">
+                    <ul id="summaryDelays" style="padding-left: 18px; font-size: 0.78rem;">
+                        <!-- Filled by JS -->
+                    </ul>
+                    <p class="upload-note">
+                        Demo data only. In a production system, this panel could aggregate updates
+                        from Transnet, port authority notices and marine news sources (e.g. Splash
+                        247) for the routes relevant to your shipments.
+                    </p>
+                </div>
+            </div>
         </section>
 
-        <!-- BOOKINGS: exporter request form -->
-        <section id="section-bookings" class="section">
-            <section class="panel">
+        <!-- ======================== BOOKINGS VIEW ======================== -->
+        <section id="view-bookings" style="display: none;">
+            <div class="panel">
                 <div class="panel-header">
                     <h2>New Booking Request</h2>
                 </div>
                 <div class="panel-body">
-                    <p class="hint">
-                        Exporter users can submit a booking request to the agent. These requests are
-                        saved in your browser for demo. In production, they would be emailed or sent
-                        to your ops system.
+                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
+                        Exporter can submit a new booking request to the agent. This is a front-end
+                        demo only – integrate with your email or TMS later.
                     </p>
-                    <form id="bookingForm" class="booking-form">
+
+                    <form id="bookingForm" class="upload-form" style="flex-direction: column; align-items: flex-start;">
                         <div class="form-row">
-                            <div class="form-field">
-                                <label for="bkExporter">Exporter</label>
-                                <input type="text" id="bkExporter" required />
-                            </div>
-                            <div class="form-field">
-                                <label for="bkConsignee">Consignee</label>
-                                <input type="text" id="bkConsignee" required />
-                            </div>
+                            <label>Exporter Reference</label>
+                            <input type="text" id="bkExporterRef" required />
                         </div>
                         <div class="form-row">
-                            <div class="form-field">
-                                <label for="bkCommodity">Commodity</label>
-                                <input
-                                    type="text"
-                                    id="bkCommodity"
-                                    placeholder="Soft citrus, grapes, plums, avos..."
-                                    required
-                                />
-                            </div>
-                            <div class="form-field">
-                                <label for="bkDestination">Destination</label>
-                                <input type="text" id="bkDestination" required />
-                            </div>
+                            <label>Commodity / Grade</label>
+                            <input type="text" id="bkCommodity" required />
                         </div>
                         <div class="form-row">
-                            <div class="form-field">
-                                <label for="bkVessel">Preferred Vessel / Voyage</label>
-                                <input type="text" id="bkVessel" />
-                            </div>
-                            <div class="form-field">
-                                <label for="bkETD">Preferred ETD</label>
-                                <input type="date" id="bkETD" />
-                            </div>
+                            <label>Expected Volume / Containers</label>
+                            <input type="text" id="bkVolume" required />
                         </div>
                         <div class="form-row">
-                            <div class="form-field">
-                                <label for="bkContainers">No. of Containers</label>
-                                <input type="number" id="bkContainers" min="1" />
-                            </div>
-                            <div class="form-field">
-                                <label for="bkTemp">Requested Temp Setpoint (°C)</label>
-                                <input type="text" id="bkTemp" />
-                            </div>
+                            <label>Preferred Vessel / Week</label>
+                            <input type="text" id="bkVessel" />
                         </div>
                         <div class="form-row">
-                            <div class="form-field full">
-                                <label for="bkNotes">Additional Instructions / Notes</label>
-                                <textarea
-                                    id="bkNotes"
-                                    rows="3"
-                                    placeholder="Any special market access requirements, PPECB instructions, etc."
-                                ></textarea>
-                            </div>
+                            <label>POL / POD</label>
+                            <input type="text" id="bkRoute" placeholder="e.g. Ngqura → Rotterdam" />
+                        </div>
+                        <div class="form-row">
+                            <label>Special Instructions</label>
+                            <textarea id="bkNotes" rows="3" style="width: 100%;"></textarea>
                         </div>
                         <button type="submit" class="btn primary-btn">Submit Booking Request</button>
                     </form>
 
-                    <h3 class="booking-subtitle">Recent Booking Requests (this browser)</h3>
-                    <ul id="bookingList" class="booking-list"></ul>
+                    <p id="bookingFeedback" class="upload-note"></p>
                 </div>
-            </section>
+            </div>
         </section>
 
-        <!-- REPORTS: exporter pulls Excel/CSV -->
-        <section id="section-reports" class="section">
-            <section class="panel">
+        <!-- ======================== REPORTS VIEW ======================== -->
+        <section id="view-reports" style="display: none;">
+            <div class="panel">
                 <div class="panel-header">
                     <h2>Reports</h2>
                 </div>
                 <div class="panel-body">
-                    <p class="hint">
-                        Exporter users can export consignment information into Excel (CSV) for
-                        seasonal analysis, grower reporting and QA records.
+                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
+                        Exporter and operations can pull shipment information for analysis. Below is
+                        a placeholder; later you can connect this to real exports and Excel/CSV
+                        downloads.
                     </p>
                     <button id="downloadReportBtn" class="btn secondary-btn">
-                        Download Consignment Report (CSV)
+                        Download Summary (CSV demo)
                     </button>
-                    <div class="table-wrapper" style="margin-top: 8px;">
-                        <table class="status-table" id="reportsTable">
-                            <thead>
-                                <tr>
-                                    <th>Consignment</th>
-                                    <th>Container</th>
-                                    <th>Commodity</th>
-                                    <th>Destination</th>
-                                    <th>Route Status</th>
-                                    <th>PPECB</th>
-                                    <th>Phyto / eCert</th>
-                                    <th>ETD</th>
-                                    <th>ETA</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+                    <p class="upload-note">
+                        This demo creates a simple CSV based on the sample consignments loaded in
+                        the dashboard.
+                    </p>
                 </div>
-            </section>
+            </div>
         </section>
 
-        <!-- DELAYS & MARINE NEWS -->
-        <section id="section-delays" class="section">
-            <section class="panel">
+        <!-- ======================== DATA VIEW (Placeholder) ======================== -->
+        <section id="view-data" style="display: none;">
+            <div class="panel">
                 <div class="panel-header">
-                    <h2>Delays & Port / Marine News</h2>
+                    <h2>Data & Analytics</h2>
                 </div>
                 <div class="panel-body">
-                    <p class="hint">
-                        This view summarises delays that may affect your shipments (e.g. Transnet
-                        disruptions, port strikes, weather). External feeds (Transnet notices,
-                        Splash247, etc.) can be integrated via APIs or RSS in a live system.
+                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
+                        Placeholder for future data tools – e.g. seasonal cold chain performance,
+                        PPECB pass rates, DALRRD/eCert turnaround times per exporter and commodity.
                     </p>
-                    <table class="status-table" id="globalDelayTable">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Port / Region</th>
-                                <th>Type</th>
-                                <th>Summary</th>
-                                <th>Source</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
                 </div>
+            </div>
+        </section>
+
+        <!-- ======================== FILE / CONSIGNMENT VIEW ======================== -->
+        <section id="view-file" style="display: none;">
+            <section class="consignment-layout">
+                <!-- LEFT COLUMN -->
+                <section class="left-column">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Consignment Summary</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="summary-grid">
+                                <div class="summary-block">
+                                    <table class="summary-table">
+                                        <tbody>
+                                            <tr>
+                                                <th>Consignee:</th>
+                                                <td id="consignee"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Exporter:</th>
+                                                <td id="exporter"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Notify Party:</th>
+                                                <td id="notifyParty"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Client Ref:</th>
+                                                <td id="clientRef"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Container No.:</th>
+                                                <td id="containerNo"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Commodity:</th>
+                                                <td id="commodity"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Market / Destination:</th>
+                                                <td id="marketDest"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="summary-block">
+                                    <table class="summary-table">
+                                        <tbody>
+                                            <tr>
+                                                <th>PPECB Status:</th>
+                                                <td id="ppecbStatus"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>DALRRD / eCert:</th>
+                                                <td id="dalrrdStatus"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Cold Chain:</th>
+                                                <td id="coldChainStatus"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Temperature Target:</th>
+                                                <td id="tempTarget"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Current Avg Temp:</th>
+                                                <td id="tempAvg"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Last Updated:</th>
+                                                <td id="lastUpdated"></td>
+                                            </tr>
+                                            <tr>
+                                                <th>Incoterms / Service:</th>
+                                                <td id="incoterms"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Summary -->
+                    <div class="panel panel-split">
+                        <div class="sub-panel">
+                            <div class="panel-header">
+                                <h3>Task Summary</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="status-table" id="taskTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Task</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="sub-panel">
+                            <div class="panel-header">
+                                <h3>Document Status</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="status-table" id="docStatusTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Document</th>
+                                            <th>Status</th>
+                                            <th>Comment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exporter Notes (Ops only) -->
+                    <div class="panel" id="exporterNotesPanel">
+                        <div class="panel-header">
+                            <h2>Exporter Notes (Internal)</h2>
+                        </div>
+                        <div class="panel-body">
+                            <textarea id="exportNotes" class="notes-box" readonly></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Booking & vessel summary -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Booking & Vessel Summary</h2>
+                        </div>
+                        <div class="panel-body">
+                            <table class="summary-table summary-table-wide">
+                                <tbody>
+                                    <tr>
+                                        <th>Booking Ref:</th>
+                                        <td id="bookingRef"></td>
+                                        <th>Vessel / Voyage:</th>
+                                        <td id="vesselVoyage"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Shipping Line:</th>
+                                        <td id="shippingLine"></td>
+                                        <th>Container Type:</th>
+                                        <td id="containerType"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>POL:</th>
+                                        <td id="pol"></td>
+                                        <th>POD:</th>
+                                        <td id="pod"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>ETD:</th>
+                                        <td id="etd"></td>
+                                        <th>ETA:</th>
+                                        <td id="eta"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- RIGHT COLUMN -->
+                <section class="right-column">
+                    <!-- Map panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Container Location</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div id="map" class="map-container"></div>
+                            <p id="mapMeta" class="map-meta"></p>
+                            <p class="map-note">
+                                Demo map using OpenStreetMap. For live positions, integrate with your
+                                container tracking provider or marine traffic API.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Delays panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Delays & Disruptions</h2>
+                        </div>
+                        <div class="panel-body">
+                            <ul id="fileDelays" style="padding-left: 18px; font-size: 0.78rem;">
+                                <!-- Filled by JS -->
+                            </ul>
+                            <p class="upload-note">
+                                In production, this could draw from Transnet notices, port authority
+                                alerts and marine news (e.g. Splash 247) filtered for this vessel /
+                                route.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Documents upload/download -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Consignment Documents</h2>
+                        </div>
+                        <div class="panel-body">
+                            <form id="uploadForm" class="upload-form">
+                                <label for="docUpload" class="upload-label">Upload documents</label>
+                                <input type="file" id="docUpload" multiple />
+                                <button type="submit" class="btn secondary-btn">
+                                    Add to Consignment
+                                </button>
+                            </form>
+                            <table class="status-table" id="docTable">
+                                <thead>
+                                    <tr>
+                                        <th>File Name</th>
+                                        <th>Size</th>
+                                        <th>Type</th>
+                                        <th>Download</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            <p class="upload-note">
+                                On GitHub Pages, files are stored in-browser only for this session.
+                                A backend is required for shared document storage.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Messages on this File</h2>
+                        </div>
+                        <div class="panel-body">
+                            <ul id="messageList" style="padding-left: 18px; font-size: 0.78rem;">
+                                <!-- Filled by JS -->
+                            </ul>
+                            <form id="messageForm" class="upload-form" style="margin-top: 6px; flex-direction: column; align-items: flex-start;">
+                                <label for="messageText" class="upload-label">Post a message</label>
+                                <textarea
+                                    id="messageText"
+                                    rows="3"
+                                    style="width: 100%; font-size: 0.8rem;"
+                                    placeholder="Add an update or question about this shipment..."
+                                ></textarea>
+                                <button type="submit" class="btn secondary-btn">Post Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
             </section>
         </section>
     </main>
@@ -518,17 +500,17 @@
     <footer class="consignment-footer">
         <p>
             PA-CryoChain • PPECB-aligned • DALRRD documentation compliant • For operational
-            visibility only – always verify with official systems.
+            visibility and training only – always verify with official PPECB & DALRRD records.
         </p>
     </footer>
 
-    <!-- Leaflet JS -->
+    <!-- Leaflet JS for map -->
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9WjUyl8aI1ty0qSgCqo="
         crossorigin=""
     ></script>
-
-    <script src="dashboard.js"></script>
+    <!-- Dashboard behaviour -->
+    dashboard.js</script>
 </body>
 </html>
