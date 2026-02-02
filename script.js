@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const existingUser = localStorage.getItem("paCryoUser");
     if (existingUser && window.location.pathname.endsWith("index.html")) {
-        // Already logged in – send to dashboard
         window.location.href = "dashboard.html";
         return;
     }
@@ -16,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
-
         const username = document.getElementById("username").value.trim();
         const role = document.getElementById("role").value;
         const password = document.getElementById("password").value;
@@ -26,10 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // NOTE: This is a front-end demo only – no real authentication.
+        // Demo only: any username/password works.
         const user = {
             username,
-            role, // "client" or "internal"
+            role,
             loginTime: new Date().toISOString()
         };
 
@@ -37,3 +35,4 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "dashboard.html";
     });
 });
+``
