@@ -3,245 +3,292 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PA-CryoChain | Dashboard</title>
-    dashboard.css
-    manifest.json
+    <title>PA-CryoChain | Consignment Overview</title>
+
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Leaflet CSS for the map -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
 </head>
-<body>
-    <div class="app-shell">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                assets/marine-traffic-logo.png
-                <h2>PA-CryoChain</h2>
-                <p class="role-label" id="userRoleLabel"></p>
+<body class="consignment-body">
+    <!-- Top green nav bar -->
+    <header class="main-header">
+        <div class="header-left">
+            <div class="logo-inline">
+                <span class="logo-symbol">❄️🍎🍊</span>
+                <span class="logo-title">PA-CryoChain</span>
+            </div>
+            <nav class="top-nav">
+                <a href="#" class="nav-link active">home</a>
+                <a href="#" class="nav-link">bookings</a>
+                <a href="#" class="nav-link">doc manager</a>
+                <a href="#" class="nav-link">customs</a>
+                <a href="#" class="nav-link">issues</a>
+                <a href="#" class="nav-link">reports</a>
+                <a href="#" class="nav-link">data</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <span id="headerYear" class="header-badge"></span>
+            <span id="headerUser" class="header-user"></span>
+            <button id="logoutBtn" class="header-icon-btn" title="Log out">⎋</button>
+        </div>
+    </header>
+
+    <!-- Consignment title bar -->
+    <section class="consignment-bar">
+        <div>
+            <h1 id="consignmentTitle">Consignment FRH60022</h1>
+            <p id="consignmentSub" class="consignment-sub">
+                Shipment overview with PPECB, DALRRD/eCert, cold chain & documents
+            </p>
+        </div>
+        <div class="consignment-actions">
+            <button class="btn secondary-btn">View Consignment</button>
+            <button class="btn secondary-btn">View Itinerary</button>
+            <button class="btn secondary-btn">Make Amendment</button>
+            <button class="btn primary-btn">Save Consignment</button>
+        </div>
+    </section>
+
+    <!-- Main two-column layout -->
+    <main class="consignment-layout">
+        <!-- LEFT COLUMN -->
+        <section class="left-column">
+            <!-- Shipment summary -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Consignment Summary</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="summary-grid">
+                        <div class="summary-block">
+                            <table class="summary-table">
+                                <tbody>
+                                    <tr>
+                                        <th>Consignee:</th>
+                                        <td id="consignee"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Exporter:</th>
+                                        <td id="exporter"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Notify Party:</th>
+                                        <td id="notifyParty"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Client Ref:</th>
+                                        <td id="clientRef"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Container No.:</th>
+                                        <td id="containerNo"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Commodity:</th>
+                                        <td id="commodity"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Market / Destination:</th>
+                                        <td id="marketDest"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="summary-block">
+                            <table class="summary-table">
+                                <tbody>
+                                    <tr>
+                                        <th>PPECB Status:</th>
+                                        <td id="ppecbStatus"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>DALRRD / eCert:</th>
+                                        <td id="dalrrdStatus"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cold Chain:</th>
+                                        <td id="coldChainStatus"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Temperature Target:</th>
+                                        <td id="tempTarget"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current Avg Temp:</th>
+                                        <td id="tempAvg"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Updated:</th>
+                                        <td id="lastUpdated"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Incoterms / Service:</th>
+                                        <td id="incoterms"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <nav class="sidebar-nav">
-                <button class="nav-item active" data-section="overview">Overview</button>
-                <button class="nav-item" data-section="shipments">Shipments</button>
-                <button class="nav-item" data-section="temperatures">Temperatures</button>
-                <button class="nav-item" data-section="documents">Documents</button>
-                <button class="nav-item" data-section="notifications">Notifications</button>
-                <button class="nav-item" data-section="help">Help & FAQs</button>
-
-                <div id="internalNav" class="sidebar-divider">
-                    <p class="sidebar-section-label">Internal Modules</p>
-                    <button class="nav-item" data-section="ppecbDalrrd">PPECB & DALRRD</button>
-                    <button class="nav-item" data-section="clients">Clients</button>
-                    <button class="nav-item" data-section="reports">Reports</button>
-                    <button class="nav-item" data-section="admin">Admin</button>
+            <!-- Export notes -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Export Notes</h2>
                 </div>
-            </nav>
-
-            <button id="logoutBtn" class="btn secondary-btn logout-btn">Log Out</button>
-        </aside>
-
-        <main class="main-content">
-            <header class="topbar">
-                <div>
-                    <h1>Dashboard</h1>
-                    <p id="welcomeMessage"></p>
+                <div class="panel-body">
+                    <textarea id="exportNotes" class="notes-box" readonly></textarea>
                 </div>
-                <div class="topbar-filters">
-                    <select id="commodityFilter">
-                        <option value="all">All commodities</option>
-                        <option value="Citrus">Citrus</option>
-                        <option value="Deciduous">Deciduous</option>
-                        <option value="Exotic">Exotic</option>
-                        <option value="Stone Fruit">Stone Fruit</option>
-                    </select>
-                    <select id="marketFilter">
-                        <option value="all">All markets</option>
-                        <option value="EU">EU</option>
-                        <option value="UK">UK</option>
-                        <option value="USA">USA</option>
-                        <option value="Middle East">Middle East</option>
-                        <option value="Far East">Far East</option>
-                    </select>
-                </div>
-            </header>
+            </div>
 
-            <!-- OVERVIEW SECTION -->
-            <section id="section-overview" class="section visible">
-                <h2>Operational Overview</h2>
-                <div class="cards-grid" id="overviewCards"></div>
-
-                <div class="grid-2">
-                    <div class="panel">
-                        <h3>Cold Chain Status Snapshot</h3>
-                        <div id="tempSummary"></div>
+            <!-- Task / Doc status -->
+            <div class="panel panel-split">
+                <div class="sub-panel">
+                    <div class="panel-header">
+                        <h3>Task Summary</h3>
                     </div>
-                    <div class="panel">
-                        <h3>Regulatory Status Snapshot</h3>
-                        <div id="regSummary"></div>
+                    <div class="panel-body">
+                        <table class="status-table" id="taskTable">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Status</th>
+                                    <th>Owner</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
-            </section>
 
-            <!-- SHIPMENTS SECTION -->
-            <section id="section-shipments" class="section">
-                <h2>Shipments</h2>
-                <p class="section-intro">
-                    Track shipments across commodities with PPECB and DALRRD/eCert status visibility.
-                </p>
-                <div class="table-wrapper">
-                    <table class="data-table" id="shipmentsTable">
-                        <thead>
+                <div class="sub-panel">
+                    <div class="panel-header">
+                        <h3>Document Status</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="status-table" id="docStatusTable">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Status</th>
+                                    <th>Required By</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking / vessel summary -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Booking & Vessel Summary</h2>
+                </div>
+                <div class="panel-body">
+                    <table class="summary-table summary-table-wide">
+                        <tbody>
                             <tr>
-                                <th>Shipment</th>
-                                <th>Container</th>
-                                <th>Commodity</th>
-                                <th>Market</th>
-                                <th>PPECB</th>
-                                <th>DALRRD / eCert</th>
-                                <th>Cold Chain</th>
+                                <th>Booking Ref:</th>
+                                <td id="bookingRef"></td>
+                                <th>Vessel / Voyage:</th>
+                                <td id="vesselVoyage"></td>
                             </tr>
-                        </thead>
-                        <tbody></tbody>
+                            <tr>
+                                <th>Shipping Line:</th>
+                                <td id="shippingLine"></td>
+                                <th>Container Type:</th>
+                                <td id="containerType"></td>
+                            </tr>
+                            <tr>
+                                <th>POL:</th>
+                                <td id="pol"></td>
+                                <th>POD:</th>
+                                <td id="pod"></td>
+                            </tr>
+                            <tr>
+                                <th>ETD:</th>
+                                <td id="etd"></td>
+                                <th>ETA:</th>
+                                <td id="eta"></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- TEMPERATURES SECTION -->
-            <section id="section-temperatures" class="section">
-                <h2>Cold Chain Monitoring</h2>
-                <p class="section-intro">
-                    Commodity-based temperature visibility for containers under your control.
-                </p>
-                <div class="table-wrapper">
-                    <table class="data-table" id="temperaturesTable">
-                        <thead>
-                            <tr>
-                                <th>Container</th>
-                                <th>Commodity</th>
-                                <th>Target Range (°C)</th>
-                                <th>Current Avg (°C)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+        <!-- RIGHT COLUMN -->
+        <section class="right-column">
+            <!-- Map -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Container Location</h2>
                 </div>
-                <p class="hint">
-                    *Temperature targets based on PPECB guidance. Always confirm requirements per
-                    market and protocol.
-                </p>
-            </section>
+                <div class="panel-body">
+                    <div id="map" class="map-container"></div>
+                    <p id="mapMeta" class="map-meta"></p>
+                    <p class="map-note">
+                        Map uses OpenStreetMap demo data. For live positions, integrate your
+                        container tracking provider later.
+                    </p>
+                </div>
+            </div>
 
-            <!-- DOCUMENTS SECTION -->
-            <section id="section-documents" class="section">
-                <h2>Document Vault</h2>
-                <p class="section-intro">
-                    Central access to PPECB inspection reports, DALRRD/eCert documents and exporter
-                    paperwork per shipment.
-                </p>
-                <div class="table-wrapper">
-                    <table class="data-table" id="documentsTable">
+            <!-- Documents upload/download -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Consignment Documents</h2>
+                </div>
+                <div class="panel-body">
+                    <form id="uploadForm" class="upload-form">
+                        <label for="docUpload" class="upload-label">Upload documents</label>
+                        <input type="file" id="docUpload" multiple />
+                        <button type="submit" class="btn secondary-btn">Add to Consignment</button>
+                    </form>
+                    <table class="status-table" id="docTable">
                         <thead>
                             <tr>
-                                <th>Shipment</th>
-                                <th>Container</th>
-                                <th>Document Type</th>
-                                <th>Status</th>
+                                <th>File Name</th>
+                                <th>Size</th>
+                                <th>Type</th>
                                 <th>Download</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
+                    <p class="upload-note">
+                        Note: On GitHub Pages, uploaded files are kept only in this browser session
+                        for demo purposes. A backend is required for shared, long-term storage.
+                    </p>
                 </div>
-            </section>
+            </div>
+        </section>
+    </main>
 
-            <!-- NOTIFICATIONS SECTION -->
-            <section id="section-notifications" class="section">
-                <h2>Notifications</h2>
-                <ul id="notificationsList" class="notification-list"></ul>
-            </section>
+    <footer class="consignment-footer">
+        <p>
+            PA-CryoChain • PPECB-aligned • DALRRD documentation compliant • For training and
+            operational visibility only – always verify with official systems.
+        </p>
+    </footer>
 
-            <!-- HELP SECTION -->
-            <section id="section-help" class="section">
-                <h2>Help & FAQs</h2>
-                <div class="faq">
-                    <details>
-                        <summary>How are PPECB statuses updated in this system?</summary>
-                        <p>
-                            PA-CryoChain reflects PPECB statuses based on official inspection
-                            results, NCRs and cooling confirmations received from PPECB and your own
-                            operational records. This system does not replace official PPECB
-                            communications.
-                        </p>
-                    </details>
-                    <details>
-                        <summary>How are DALRRD/eCert statuses updated?</summary>
-                        <p>
-                            DALRRD and eCert statuses are updated once phytosanitary certificates,
-                            approvals and related documentation are received. For legal or
-                            regulatory questions, please confirm directly with DALRRD.
-                        </p>
-                    </details>
-                    <details>
-                        <summary>Which commodities are supported?</summary>
-                        <p>
-                            PA-CryoChain currently supports citrus, deciduous, exotic and stone
-                            fruit types, with commodity-based temperature targets and workflow
-                            logic.
-                        </p>
-                    </details>
-                    <details>
-                        <summary>Who do I contact for support?</summary>
-                        <p>
-                            Please contact your operations team or PA support for assistance. You
-                            may also log a query through your usual communication channels.
-                        </p>
-                    </details>
-                </div>
-            </section>
+    <!-- Leaflet JS for the map -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-VuZ8HksRrjA9QnE56xU02zsz5W+b/xG4R0C2Bqm3G1w="
+        crossorigin=""
+    ></script>
 
-            <!-- PPECB & DALRRD SECTION (INTERNAL ONLY) -->
-            <section id="section-ppecbDalrrd" class="section">
-                <h2>PPECB & DALRRD Tracking (Internal)</h2>
-                <p class="section-intro">
-                    Internal view of inspections, NCRs, cooling status and DALRRD/eCert progress.
-                </p>
-                <div class="table-wrapper">
-                    <table class="data-table" id="regTable">
-                        <thead>
-                            <tr>
-                                <th>Shipment</th>
-                                <th>Container</th>
-                                <th>Commodity</th>
-                                <th>PPECB Stage</th>
-                                <th>PPECB Notes</th>
-                                <th>DALRRD / eCert Stage</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- CLIENTS SECTION (INTERNAL ONLY) -->
-            <section id="section-clients" class="section">
-                <h2>Client Accounts (Internal)</h2>
-                <p>Placeholder for managing client/exporter profiles and access.</p>
-            </section>
-
-            <!-- REPORTS SECTION (INTERNAL ONLY) -->
-            <section id="section-reports" class="section">
-                <h2>Reports (Internal)</h2>
-                <p>
-                    Future module: export cold chain compliance reports, seasonal performance and
-                    NCR analytics by commodity and market.
-                </p>
-            </section>
-
-            <!-- ADMIN SECTION (INTERNAL ONLY) -->
-            <section id="section-admin" class="section">
-                <h2>Admin (Internal)</h2>
-                <p>Placeholder for user management, role assignments and system configuration.</p>
-            </section>
-        </main>
-    </div>
-
-    dashboard.js</script>
+    <script src="dashboard.js"></script>
 </body>
 </html>
