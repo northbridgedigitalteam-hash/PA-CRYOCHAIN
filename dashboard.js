@@ -1,367 +1,274 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Redirect to login if not "logged in"
     const userRaw = localStorage.getItem("paCryoUser");
     if (!userRaw) {
         window.location.href = "index.html";
         return;
     }
-
     const user = JSON.parse(userRaw);
-    const isInternal = user.role === "internal";
 
-    // UI references
-    const welcomeMessage = document.getElementById("welcomeMessage");
-    const userRoleLabel = document.getElementById("userRoleLabel");
-    const internalNav = document.getElementById("internalNav");
+    // Header info
+    const headerYear = document.getElementById("headerYear");
+    const headerUser = document.getElementById("headerUser");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    const commodityFilter = document.getElementById("commodityFilter");
-    const marketFilter = document.getElementById("marketFilter");
-
-    const overviewCards = document.getElementById("overviewCards");
-    const tempSummary = document.getElementById("tempSummary");
-    const regSummary = document.getElementById("regSummary");
-
-    const shipmentsTableBody = document.querySelector("#shipmentsTable tbody");
-    const temperaturesTableBody = document.querySelector("#temperaturesTable tbody");
-    const documentsTableBody = document.querySelector("#documentsTable tbody");
-    const regTableBody = document.querySelector("#regTable tbody");
-    const notificationsList = document.getElementById("notificationsList");
-
-    // --------- SAMPLE DEMO DATA (Replace with API integration later) -------------
-
-    const shipments = [
-        {
-            id: "NB-2026-001",
-            container: "MSCU1234567",
-            commodityGroup: "Citrus",
-            commodity: "Navel Oranges",
-            market: "EU",
-            ppecbStatus: "Inspection Passed",
-            ppecbStage: "Cooling Authorised",
-            ppecbNotes: "Within spec, no NCR.",
-            dalrrdStatus: "Phyto Approved",
-            dalrrdStage: "eCert Completed",
-            tempTarget: "0.0°C to +0.5°C",
-            tempAvg: 0.2,
-            tempStatus: "Within Spec",
-            tempSeverity: "ok",
-            coldChainStatus: "Compliant",
-            documents: [
-                { type: "PPECB Inspection Sheet", status: "Available", link: "#" },
-                { type: "Phytosanitary Certificate", status: "Available", link: "#" }
-            ]
-        },
-        {
-            id: "NB-2026-002",
-            container: "MSCU2345678",
-            commodityGroup: "Deciduous",
-            commodity: "Table Grapes",
-            market: "UK",
-            ppecbStatus: "Inspection Passed",
-            ppecbStage: "Cooling",
-            ppecbNotes: "SO₂ pads verified, cartons sound.",
-            dalrrdStatus: "Awaiting Approval",
-            dalrrdStage: "Docs Submitted",
-            tempTarget: "-1.0°C to -0.5°C",
-            tempAvg: -0.3,
-            tempStatus: "Slightly Above Target",
-            tempSeverity: "warn",
-            coldChainStatus: "Watch",
-            documents: [
-                { type: "PPECB Inspection Sheet", status: "Available", link: "#" },
-                { type: "Commercial Invoice", status: "Available", link: "#" }
-            ]
-        },
-        {
-            id: "NB-2026-003",
-            container: "MSCU3456789",
-            commodityGroup: "Stone Fruit",
-            commodity: "Plums",
-            market: "Middle East",
-            ppecbStatus: "Inspection Failed",
-            ppecbStage: "NCR Issued",
-            ppecbNotes: "Pressure test failed – soft fruit.",
-            dalrrdStatus: "On Hold",
-            dalrrdStage: "Awaiting PPECB Clearance",
-            tempTarget: "-0.5°C to +1.0°C",
-            tempAvg: 3.1,
-            tempStatus: "Outside Spec",
-            tempSeverity: "bad",
-            coldChainStatus: "Non-compliant",
-            documents: [
-                { type: "NCR Report", status: "Available", link: "#" }
-            ]
-        },
-        {
-            id: "NB-2026-004",
-            container: "MSCU4567890",
-            commodityGroup: "Exotic",
-            commodity: "Avocados",
-            market: "Far East",
-            ppecbStatus: "Inspection Booked",
-            ppecbStage: "Booking Confirmed",
-            ppecbNotes: "Inspection scheduled 2026-02-03.",
-            dalrrdStatus: "Not Submitted",
-            dalrrdStage: "Pending Docs",
-            tempTarget: "5°C to 7°C",
-            tempAvg: 5.8,
-            tempStatus: "Within Spec",
-            tempSeverity: "ok",
-            coldChainStatus: "Compliant",
-            documents: [
-                { type: "Packing List", status: "Missing", link: "#" }
-            ]
-        }
-    ];
-
-    const notifications = [
-        {
-            message: "PPECB inspection passed for NB-2026-001 (MSCU1234567).",
-            time: "Just now"
-        },
-        {
-            message: "NCR issued for NB-2026-003 – pressure failure on plums.",
-            time: "10 min ago"
-        },
-        {
-            message: "Docs for avocados (NB-2026-004) still required for DALRRD submission.",
-            time: "Today"
-        }
-    ];
-
-    // -------------- INITIAL SETUP -----------------
-
-    welcomeMessage.textContent = `Welcome, ${user.username} – ${
-        isInternal ? "Internal Operations View" : "Client View"
-    }`;
-    userRoleLabel.textContent = isInternal ? "Internal Operations / PA" : "Client / Exporter";
-
-    if (!isInternal && internalNav) {
-        internalNav.style.display = "none";
-    }
+    headerYear.textContent = new Date().getFullYear();
+    headerUser.textContent = `${user.username} (${user.role === "internal" ? "Internal" : "Client"})`;
 
     logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("paCryoUser");
         window.location.href = "index.html";
     });
 
-    // Navigation handling
-    document.querySelectorAll(".nav-item").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const target = btn.getAttribute("data-section");
-            if (!target) return;
+    // ------------------ DEMO CONSIGNMENT DATA ------------------
 
-            // Toggle button active state
-            document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
+    const consignment = {
+        id: "FRH60022",
+        consignee: "PORT INTERNATIONAL EUROPEAN SOURCING GMBH",
+        exporter: "GREEN FIELDS EXPORTERS (PTY) LTD",
+        notifyParty: "PORT INTERNATIONAL EUROPEAN SOURCING GMBH",
+        clientRef: "PIE/2026/FRH60022",
+        containerNo: "MSCU1234567",
+        commodity: "Soft Citrus – Clementines",
+        marketDest: "EUROPE • ROTTERDAM, NETHERLANDS",
+        ppecbStatus: "Inspection Passed – Cooling Authorised",
+        dalrrdStatus: "Phyto Approved – eCert Completed",
+        coldChainStatus: "Compliant – within soft citrus EU spec",
+        tempTarget: "-0.5°C to 0.0°C",
+        tempAvg: 0.1,
+        lastUpdated: "2026-02-01 16:30 SAST",
+        incoterms: "CFR – Reefer Container",
+        exportNotes: [
+            "1. Exporter: GREEN FIELDS EXPORTERS (PTY) LTD.",
+            "2. Product: Class 1 Soft Citrus – Clementines packed in 15kg cartons.",
+            "3. Market: EU – Rotterdam. CBS protocol applicable.",
+            "4. PPECB inspection completed and passed. No NCR issued.",
+            "5. DALRRD phytosanitary certificate issued via eCert. Original to consignment docs.",
+            "6. Container pre-cooled and shipped in good order.",
+            "7. Monitor cold chain from depot to vessel – any deviations >0.5°C to be escalated."
+        ].join("\n"),
 
-            // Toggle sections
-            document.querySelectorAll(".section").forEach((section) => {
-                if (section.id === `section-${target}`) {
-                    section.classList.add("visible");
-                } else {
-                    section.classList.remove("visible");
-                }
-            });
-        });
-    });
+        tasks: [
+            {
+                task: "PPECB Inspection",
+                status: "Completed",
+                severity: "ok",
+                owner: "PPECB Inspector"
+            },
+            {
+                task: "DALRRD / eCert Application",
+                status: "Completed",
+                severity: "ok",
+                owner: "Export Docs Team"
+            },
+            {
+                task: "Commercial Invoice & Packing List",
+                status: "Completed",
+                severity: "ok",
+                owner: "Exporter"
+            },
+            {
+                task: "VGM / Weighbridge",
+                status: "Pending Confirmation",
+                severity: "warn",
+                owner: "Depot"
+            }
+        ],
 
-    commodityFilter.addEventListener("change", renderAll);
-    marketFilter.addEventListener("change", renderAll);
+        docStatus: [
+            {
+                doc: "PPECB Inspection Report",
+                status: "Complete",
+                severity: "ok",
+                requiredBy: "Before Gate-in"
+            },
+            {
+                doc: "Phytosanitary Certificate (DALRRD)",
+                status: "Complete",
+                severity: "ok",
+                requiredBy: "Before Vessel Load"
+            },
+            {
+                doc: "Commercial Invoice",
+                status: "Complete",
+                severity: "ok",
+                requiredBy: "Before Customs"
+            },
+            {
+                doc: "Packing List",
+                status: "In Progress",
+                severity: "warn",
+                requiredBy: "Before Gate-in"
+            }
+        ],
 
-    // ---------- Rendering functions ----------
+        bookingRef: "NB-2026-001",
+        vesselVoyage: "SANTA TERESA / 052W",
+        shippingLine: "MSC",
+        containerType: "40' HC Reefer",
+        pol: "Port of Ngqura (ZA NQZ)",
+        pod: "Rotterdam (NL RTM)",
+        etd: "2026-02-05",
+        eta: "2026-02-19",
 
-    function filteredShipments() {
-        const commodity = commodityFilter.value;
-        const market = marketFilter.value;
+        // Map position – approx. off Port of Ngqura
+        position: {
+            lat: -33.8,
+            lng: 25.7,
+            description: "En route from Nelson Mandela Bay to Rotterdam"
+        }
+    };
 
-        return shipments.filter((s) => {
-            const matchCommodity = commodity === "all" || s.commodityGroup === commodity;
-            const matchMarket = market === "all" || s.market === market;
-            return matchCommodity && matchMarket;
-        });
-    }
+    // ------------------ FILL SUMMARY FIELDS ------------------
 
-    function renderOverview() {
-        const rows = filteredShipments();
-        const total = rows.length;
-        const compliant = rows.filter((r) => r.tempSeverity === "ok").length;
-        const warning = rows.filter((r) => r.tempSeverity === "warn").length;
-        const nonCompliant = rows.filter((r) => r.tempSeverity === "bad").length;
+    const el = (id) => document.getElementById(id);
 
-        const passedPPECB = rows.filter((r) => r.ppecbStatus === "Inspection Passed").length;
-        const awaitingPPECB = rows.filter((r) => r.ppecbStatus === "Inspection Booked").length;
-        const failedPPECB = rows.filter((r) => r.ppecbStatus === "Inspection Failed").length;
+    el("consignmentTitle").textContent = `Consignment ${consignment.id}`;
+    el("consignmentSub").textContent =
+        "Shipment overview with PPECB, DALRRD/eCert, cold chain & documents";
 
-        overviewCards.innerHTML = `
-            <div class="card">
-                <div class="card-title">Total Active Shipments</div>
-                <div class="card-value">${total}</div>
-                <div class="card-meta">Filtered by current commodity & market</div>
-            </div>
-            <div class="card">
-                <div class="card-title">Cold Chain Compliant</div>
-                <div class="card-value">${compliant}</div>
-                <div class="card-meta">${warning} watch • ${nonCompliant} non-compliant</div>
-            </div>
-            <div class="card">
-                <div class="card-title">PPECB Inspections</div>
-                <div class="card-value">${passedPPECB}</div>
-                <div class="card-meta">${awaitingPPECB} booked • ${failedPPECB} failed</div>
-            </div>
-        `;
+    el("consignee").textContent = consignment.consignee;
+    el("exporter").textContent = consignment.exporter;
+    el("notifyParty").textContent = consignment.notifyParty;
+    el("clientRef").textContent = consignment.clientRef;
+    el("containerNo").textContent = consignment.containerNo;
+    el("commodity").textContent = consignment.commodity;
+    el("marketDest").textContent = consignment.marketDest;
 
-        tempSummary.innerHTML = rows
-            .map(
-                (r) => `
-            <p>
-                <strong>${r.container}</strong> – ${r.commodity} (${r.commodityGroup})<br />
-                Target: ${r.tempTarget} • Avg: ${r.tempAvg.toFixed(1)}°C
-                ${renderStatusPill(r.tempSeverity, r.tempStatus)}
-            </p>
-        `
-            )
-            .join("");
+    el("ppecbStatus").textContent = consignment.ppecbStatus;
+    el("dalrrdStatus").textContent = consignment.dalrrdStatus;
+    el("coldChainStatus").textContent = consignment.coldChainStatus;
+    el("tempTarget").textContent = consignment.tempTarget;
+    el("tempAvg").textContent = `${consignment.tempAvg.toFixed(1)}°C`;
+    el("lastUpdated").textContent = consignment.lastUpdated;
+    el("incoterms").textContent = consignment.incoterms;
 
-        const regOk = rows.filter(
-            (r) => r.ppecbStatus === "Inspection Passed" && r.dalrrdStatus.includes("Approved")
-        ).length;
+    el("exportNotes").value = consignment.exportNotes;
 
-        regSummary.innerHTML = `
-            <p>
-                Loads with <strong>PPECB passed</strong> and <strong>DALRRD approved</strong>: ${regOk}
-            </p>
-            <p>
-                For final legal status, always confirm with official PPECB & DALRRD records.
-            </p>
-        `;
-    }
+    el("bookingRef").textContent = consignment.bookingRef;
+    el("vesselVoyage").textContent = consignment.vesselVoyage;
+    el("shippingLine").textContent = consignment.shippingLine;
+    el("containerType").textContent = consignment.containerType;
+    el("pol").textContent = consignment.pol;
+    el("pod").textContent = consignment.pod;
+    el("etd").textContent = consignment.etd;
+    el("eta").textContent = consignment.eta;
 
-    function renderShipmentsTable() {
-        const rows = filteredShipments();
-        shipmentsTableBody.innerHTML = rows
-            .map(
-                (s) => `
-            <tr>
-                <td>${s.id}</td>
-                <td>${s.container}</td>
-                <td>${s.commodity} (${s.commodityGroup})</td>
-                <td>${s.market}</td>
-                <td>${renderStatusPill(
-                    s.ppecbStatus === "Inspection Failed"
-                        ? "bad"
-                        : s.ppecbStatus === "Inspection Passed"
-                        ? "ok"
-                        : "warn",
-                    s.ppecbStatus
-                )}</td>
-                <td>${renderStatusPill(
-                    s.dalrrdStatus.includes("Approved")
-                        ? "ok"
-                        : s.dalrrdStatus === "Not Submitted"
-                        ? "warn"
-                        : "warn",
-                    s.dalrrdStatus
-                )}</td>
-                <td>${renderStatusPill(s.tempSeverity, s.coldChainStatus)}</td>
-            </tr>
-        `
-            )
-            .join("");
-    }
+    // ------------------ TASK & DOC STATUS TABLES ------------------
 
-    function renderTemperaturesTable() {
-        const rows = filteredShipments();
-        temperaturesTableBody.innerHTML = rows
-            .map(
-                (s) => `
-            <tr>
-                <td>${s.container}</td>
-                <td>${s.commodity} (${s.commodityGroup})</td>
-                <td>${s.tempTarget}</td>
-                <td>${s.tempAvg.toFixed(1)}°C</td>
-                <td>${renderStatusPill(s.tempSeverity, s.tempStatus)}</td>
-            </tr>
-        `
-            )
-            .join("");
-    }
+    const taskTableBody = document.querySelector("#taskTable tbody");
+    const docStatusTableBody = document.querySelector("#docStatusTable tbody");
 
-    function renderDocumentsTable() {
-        const rows = filteredShipments();
-        const docs = rows.flatMap((s) =>
-            s.documents.map((d) => ({
-                shipmentId: s.id,
-                container: s.container,
-                ...d
-            }))
-        );
-
-        documentsTableBody.innerHTML = docs
-            .map(
-                (d) => `
-            <tr>
-                <td>${d.shipmentId}</td>
-                <td>${d.container}</td>
-                <td>${d.type}</td>
-                <td>${renderStatusPill(
-                    d.status === "Available" ? "ok" : "warn",
-                    d.status
-                )}</td>
-                <td>${d.link}Download</a></td>
-            </tr>
-        `
-            )
-            .join("");
-    }
-
-    function renderRegTable() {
-        if (!isInternal || !regTableBody) return;
-        const rows = filteredShipments();
-        regTableBody.innerHTML = rows
-            .map(
-                (s) => `
-            <tr>
-                <td>${s.id}</td>
-                <td>${s.container}</td>
-                <td>${s.commodity} (${s.commodityGroup})</td>
-                <td>${s.ppecbStage}</td>
-                <td>${s.ppecbNotes}</td>
-                <td>${s.dalrrdStage}</td>
-            </tr>
-        `
-            )
-            .join("");
-    }
-
-    function renderNotifications() {
-        notificationsList.innerHTML = notifications
-            .map(
-                (n) => `
-            <li>
-                <span>${n.message}</span>
-                <small>${n.time}</small>
-            </li>
-        `
-            )
-            .join("");
-    }
-
-    function renderStatusPill(severity, label) {
+    function statusPill(label, severity) {
         let cls = "status-ok";
         if (severity === "warn") cls = "status-warn";
         if (severity === "bad") cls = "status-bad";
         return `<span class="status-pill ${cls}">${label}</span>`;
     }
 
-    function renderAll() {
-        renderOverview();
-        renderShipmentsTable();
-        renderTemperaturesTable();
-        renderDocumentsTable();
-        renderRegTable();
-        renderNotifications();
+    taskTableBody.innerHTML = consignment.tasks
+        .map(
+            (t) => `
+        <tr>
+            <td>${t.task}</td>
+            <td>${statusPill(t.status, t.severity)}</td>
+            <td>${t.owner}</td>
+        </tr>
+    `
+        )
+        .join("");
+
+    docStatusTableBody.innerHTML = consignment.docStatus
+        .map(
+            (d) => `
+        <tr>
+            <td>${d.doc}</td>
+            <td>${statusPill(d.status, d.severity)}</td>
+            <td>${d.requiredBy}</td>
+        </tr>
+    `
+        )
+        .join("");
+
+    // ------------------ MAP SETUP (Leaflet) ------------------
+
+    const map = L.map("map").setView([consignment.position.lat, consignment.position.lng], 8);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    L.marker([consignment.position.lat, consignment.position.lng])
+        .addTo(map)
+        .bindPopup(
+            `<strong>Container ${consignment.containerNo}</strong><br>${consignment.position.description}`
+        )
+        .openPopup();
+
+    const mapMeta = document.getElementById("mapMeta");
+    mapMeta.textContent = `Container ${consignment.containerNo} • ${consignment.position.description} • Last update: ${consignment.lastUpdated}`;
+
+    // ------------------ DOCUMENT UPLOAD / DOWNLOAD ------------------
+
+    const uploadForm = document.getElementById("uploadForm");
+    const fileInput = document.getElementById("docUpload");
+    const docTableBody = document.querySelector("#docTable tbody");
+
+    // In-memory list of uploaded docs (per session)
+    const uploadedDocs = [];
+
+    uploadForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const files = Array.from(fileInput.files || []);
+        if (!files.length) {
+            alert("Please choose one or more files to upload.");
+            return;
+        }
+
+        files.forEach((file) => {
+            const url = URL.createObjectURL(file);
+            uploadedDocs.push({
+                name: file.name,
+                size: file.size,
+                type: file.type || "Unknown",
+                url
+            });
+        });
+
+        fileInput.value = "";
+        renderDocTable();
+    });
+
+    function renderDocTable() {
+        if (!uploadedDocs.length) {
+            docTableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:center; color:#6b7280; font-size:0.78rem;">
+                        No documents uploaded yet. Use "Upload documents" to add files for this consignment.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        docTableBody.innerHTML = uploadedDocs
+            .map((doc, index) => {
+                const sizeKb = Math.round(doc.size / 102.4) / 10; // one decimal
+                return `
+                <tr>
+                    <td>${doc.name}</td>
+                    <td>${sizeKb} KB</td>
+                    <td>${doc.type}</td>
+                    <td>
+                        <a href="${doc.url}" download="${doc.name}">Download</a>
+                    </td>
+                </tr>
+            `;
+            })
+            .join("");
     }
 
-    renderAll();
+    // Initial doc table (empty)
+    renderDocTable();
 });
