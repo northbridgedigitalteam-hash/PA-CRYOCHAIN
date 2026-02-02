@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PA-CryoChain | Log In</title>
+
+    <!-- Login / global styles -->
     <link rel="stylesheet" href="style.css" />
+
+    <!-- PWA Manifest (optional) -->
     <link rel="manifest" href="manifest.json" />
 </head>
 <body>
@@ -22,20 +26,19 @@
         <section class="auth-info">
             <h2>End-to-End Visibility for Citrus, Deciduous, Exotic & Stone Fruit</h2>
             <p>
-                Exporters land on a summary dashboard showing consignments, vessels and shipments
-                on route. Selecting a file opens the detailed consignment dashboard with map,
-                tasks, documents and messaging.
+                Track consignments, container positions, PPECB & DALRRD status, and documents in one
+                place.
             </p>
             <ul class="feature-list">
-                <li>• Summary by consignment, vessel and route status</li>
-                <li>• File dashboard with integrated container map</li>
-                <li>• Task & document status including SI, Phyto & certificates</li>
-                <li>• Bookings, reports & delay/port news views</li>
+                <li>• Summary dashboard for exporters (consignments, vessels, shipments on route)</li>
+                <li>• File-level dashboard for internal / operations</li>
+                <li>• Integrated map & document status tracking</li>
             </ul>
         </section>
 
         <section class="auth-card">
             <h2>Sign in to PA-CryoChain</h2>
+            <!-- IMPORTANT: IDs must match script.js -->
             <form id="loginForm">
                 <div class="form-group">
                     <label for="username">Email or Username</label>
@@ -71,8 +74,9 @@
                 <button type="submit" class="btn primary-btn">Sign In</button>
 
                 <p class="disclaimer">
-                    Demo only – any username/password works. PPECB & DALRRD statuses mirror your
-                    operational info and do not replace official systems.
+                    Demo only – any username and password will work. PPECB & DALRRD statuses shown
+                    in the dashboard mirror operational information and do not replace official
+                    systems.
                 </p>
             </form>
         </section>
@@ -88,6 +92,7 @@
         </p>
     </footer>
 
+    <!-- IMPORTANT: include script.js before closing body -->
     <script src="script.js"></script>
 </body>
 </html>
