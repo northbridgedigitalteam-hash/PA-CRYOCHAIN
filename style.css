@@ -1,205 +1,294 @@
-:root {
-    --bg: #050816;
-    --bg-elevated: #0b1020;
-    --accent: #33bba6;
-    --accent-soft: rgba(51, 187, 166, 0.16);
-    --text: #f5f7fb;
-    --muted: #9ca3af;
-    --danger: #f97373;
-    --border-subtle: #1f2937;
-    --radius-lg: 14px;
-    --radius-sm: 8px;
-    --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.6);
-    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PA-CryoChain | Consignment Overview</title>
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="manifest" href="manifest.json" />
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: var(--font-main);
-    color: var(--text);
-    background: radial-gradient(circle at top left, #182245 0, #050816 55%, #02030a 100%);
-}
+    <!-- Leaflet CSS for the map -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+</head>
+<body class="consignment-body">
+    <!-- Top green nav bar -->
+    <header class="main-header">
+        <div class="header-left">
+            <div class="logo-inline">
+                <span class="logo-symbol">❄️🍎🍊</span>
+                <span class="logo-title">PA-CryoChain</span>
+            </div>
+            <nav class="top-nav">
+                <a href="#" class="nav-link active">home</a>
+                <a href="#" class="nav-link">bookings</a>
+                <a href="#" class="nav-link">doc manager</a>
+                <a href="#" class="nav-link">customs</a>
+                <a href="#" class="nav-link">issues</a>
+                <a href="#" class="nav-link">reports</a>
+                <a href="#" class="nav-link">data</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <span id="headerYear" class="header-badge"></span>
+            <span id="headerUser" class="header-user"></span>
+            <button id="logoutBtn" class="header-icon-btn" title="Log out">⎋</button>
+        </div>
+    </header>
 
-/* Header */
+    <!-- Consignment title bar -->
+    <section class="consignment-bar">
+        <div>
+            <h1 id="consignmentTitle">Consignment FRH60022</h1>
+            <p id="consignmentSub" class="consignment-sub">
+                Shipment overview with PPECB, DALRRD/eCert, cold chain & documents
+            </p>
+        </div>
+        <div class="consignment-actions">
+            <button class="btn secondary-btn">View Consignment</button>
+            <button class="btn secondary-btn">View Itinerary</button>
+            <button class="btn secondary-btn">Make Amendment</button>
+            <button class="btn primary-btn">Save Consignment</button>
+        </div>
+    </section>
 
-.site-header {
-    display: flex;
-    justify-content: center;
-    padding: 16px 24px;
-}
+    <!-- Main two-column layout -->
+    <main class="consignment-layout">
+        <!-- LEFT COLUMN -->
+        <section class="left-column">
+            <!-- Shipment summary -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Consignment Summary</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="summary-grid">
+                        <div class="summary-block">
+                            <table class="summary-table">
+                                <tbody>
+                                    <tr>
+                                        <th>Consignee:</th>
+                                        <td id="consignee"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Exporter:</th>
+                                        <td id="exporter"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Notify Party:</th>
+                                        <td id="notifyParty"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Client Ref:</th>
+                                        <td id="clientRef"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Container No.:</th>
+                                        <td id="containerNo"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Commodity:</th>
+                                        <td id="commodity"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Market / Destination:</th>
+                                        <td id="marketDest"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="summary-block">
+                            <table class="summary-table">
+                                <tbody>
+                                    <tr>
+                                        <th>PPECB Status:</th>
+                                        <td id="ppecbStatus"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>DALRRD / eCert:</th>
+                                        <td id="dalrrdStatus"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cold Chain:</th>
+                                        <td id="coldChainStatus"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Temperature Target:</th>
+                                        <td id="tempTarget"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Current Avg Temp:</th>
+                                        <td id="tempAvg"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Updated:</th>
+                                        <td id="lastUpdated"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Incoterms / Service:</th>
+                                        <td id="incoterms"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-.logo-area {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    border-radius: 999px;
-    background: rgba(9, 9, 20, 0.8);
-    border: 1px solid rgba(156, 163, 175, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(15px);
-}
+            <!-- Export notes -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Export Notes</h2>
+                </div>
+                <div class="panel-body">
+                    <textarea id="exportNotes" class="notes-box" readonly></textarea>
+                </div>
+            </div>
 
-.logo {
-    width: 42px;
-    height: 42px;
-    object-fit: contain;
-}
+            <!-- Task / Doc status -->
+            <div class="panel panel-split">
+                <div class="sub-panel">
+                    <div class="panel-header">
+                        <h3>Task Summary</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="status-table" id="taskTable">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Status</th>
+                                    <th>Owner</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
 
-.logo-text h1 {
-    margin: 0;
-    font-size: 1.1rem;
-}
+                <div class="sub-panel">
+                    <div class="panel-header">
+                        <h3>Document Status</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="status-table" id="docStatusTable">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Status</th>
+                                    <th>Required By</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-.logo-text p {
-    margin: 0;
-    font-size: 0.75rem;
-    color: var(--muted);
-}
+            <!-- Booking / vessel summary -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Booking & Vessel Summary</h2>
+                </div>
+                <div class="panel-body">
+                    <table class="summary-table summary-table-wide">
+                        <tbody>
+                            <tr>
+                                <th>Booking Ref:</th>
+                                <td id="bookingRef"></td>
+                                <th>Vessel / Voyage:</th>
+                                <td id="vesselVoyage"></td>
+                            </tr>
+                            <tr>
+                                <th>Shipping Line:</th>
+                                <td id="shippingLine"></td>
+                                <th>Container Type:</th>
+                                <td id="containerType"></td>
+                            </tr>
+                            <tr>
+                                <th>POL:</th>
+                                <td id="pol"></td>
+                                <th>POD:</th>
+                                <td id="pod"></td>
+                            </tr>
+                            <tr>
+                                <th>ETD:</th>
+                                <td id="etd"></td>
+                                <th>ETA:</th>
+                                <td id="eta"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-/* Layout */
+        <!-- RIGHT COLUMN -->
+        <section class="right-column">
+            <!-- Map -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Container Location</h2>
+                </div>
+                <div class="panel-body">
+                    <div id="map" class="map-container"></div>
+                    <p id="mapMeta" class="map-meta"></p>
+                    <p class="map-note">
+                        Map uses OpenStreetMap demo data. For live positions, integrate your
+                        container tracking provider later.
+                    </p>
+                </div>
+            </div>
 
-.auth-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: 40px;
-    padding: 24px clamp(16px, 6vw, 72px);
-    align-items: center;
-}
+            <!-- Documents upload/download -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Consignment Documents</h2>
+                </div>
+                <div class="panel-body">
+                    <form id="uploadForm" class="upload-form">
+                        <label for="docUpload" class="upload-label">Upload documents</label>
+                        <input type="file" id="docUpload" multiple />
+                        <button type="submit" class="btn secondary-btn">Add to Consignment</button>
+                    </form>
+                    <table class="status-table" id="docTable">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Size</th>
+                                <th>Type</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <p class="upload-note">
+                        Note: On GitHub Pages, uploaded files are kept only in this browser session
+                        for demo purposes. A backend is required for shared, long-term storage.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
 
-.auth-info h2 {
-    font-size: clamp(1.6rem, 2.2vw, 2rem);
-    margin-bottom: 8px;
-}
+    <footer class="consignment-footer">
+        <p>
+            PA-CryoChain • PPECB-aligned • DALRRD documentation compliant • For training and
+            operational visibility only – always verify with official systems.
+        </p>
+    </footer>
 
-.auth-info p {
-    color: var(--muted);
-    max-width: 600px;
-}
+    <!-- Leaflet JS for the map -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-VuZ8HksRrjA9QnE56xU02zsz5W+b/xG4R0C2Bqm3G1w="
+        crossorigin=""
+    ></script>
 
-.feature-list {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0 0;
-}
-
-.feature-list li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    color: var(--muted);
-}
-
-/* Auth Card */
-
-.auth-card {
-    background: radial-gradient(circle at top, #111827, #020617);
-    border-radius: 20px;
-    padding: 26px 24px 26px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.auth-card h2 {
-    margin-top: 0;
-    margin-bottom: 18px;
-    font-size: 1.2rem;
-}
-
-.form-group {
-    margin-bottom: 14px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 0.85rem;
-    color: var(--muted);
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 9px 11px;
-    border-radius: 10px;
-    border: 1px solid var(--border-subtle);
-    background: rgba(15, 23, 42, 0.9);
-    color: var(--text);
-    font-size: 0.9rem;
-}
-
-.form-group input::placeholder {
-    color: #6b7280;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    padding: 9px 16px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: all 0.18s ease-out;
-}
-
-.primary-btn {
-    width: 100%;
-    background: linear-gradient(120deg, #33bba6, #5c9df1);
-    color: #020617;
-    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
-}
-
-.primary-btn:hover {
-    filter: brightness(1.06);
-    transform: translateY(-1px);
-}
-
-.disclaimer {
-    margin-top: 14px;
-    font-size: 0.75rem;
-    color: var(--muted);
-}
-
-/* Footer */
-
-.site-footer {
-    padding: 16px 24px 20px;
-    text-align: center;
-    font-size: 0.75rem;
-    color: #6b7280;
-}
-
-.footer-meta {
-    margin-top: 4px;
-}
-
-/* Responsive */
-
-@media (max-width: 900px) {
-    .auth-layout {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 16px 16px 28px;
-    }
-
-    .auth-info {
-        order: 2;
-        text-align: left;
-    }
-
-    .auth-card {
-        order: 1;
-    }
-}
+    <script src="dashboard.js"></script>
+</body>
+</html>
