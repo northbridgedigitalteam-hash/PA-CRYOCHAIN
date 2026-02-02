@@ -1,429 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryoChain | Container Intelligence Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PA-CryoChain | Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+    <link rel="manifest" href="manifest.json" />
 </head>
-<body class="dashboard-page">
-    <!-- ===== DASHBOARD HEADER ===== -->
-    <header class="dashboard-header">
-        <div class="header-top">
-            <div class="logo">
-                <i class="fas fa-snowflake logo-icon"></i>
-                <span>CryoChain</span>
-                <span class="badge-beta">PRO</span>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/marine-traffic-logo.png" alt="Logo" class="sidebar-logo" />
+                <h2>PA-CryoChain</h2>
+                <p class="role-label" id="userRoleLabel"></p>
             </div>
-            
-            <div class="header-actions">
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search container, BL, client ref..." id="globalSearch">
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="overview">Overview</button>
+                <button class="nav-item" data-section="shipments">Shipments</button>
+                <button class="nav-item" data-section="temperatures">Temperatures</button>
+                <button class="nav-item" data-section="documents">Documents</button>
+                <button class="nav-item" data-section="notifications">Notifications</button>
+                <button class="nav-item" data-section="help">Help & FAQs</button>
+
+                <div id="internalNav" class="sidebar-divider">
+                    <p class="sidebar-section-label">Internal Modules</p>
+                    <button class="nav-item" data-section="ppecbDalrrd">PPECB & DALRRD</button>
+                    <button class="nav-item" data-section="clients">Clients</button>
+                    <button class="nav-item" data-section="reports">Reports</button>
+                    <button class="nav-item" data-section="admin">Admin</button>
                 </div>
-                
-                <div class="user-profile">
-                    <div class="notification-badge" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge-count">3</span>
+            </nav>
+
+            <button id="logoutBtn" class="btn secondary-btn logout-btn">Log Out</button>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p id="welcomeMessage"></p>
+                </div>
+                <div class="topbar-filters">
+                    <select id="commodityFilter">
+                        <option value="all">All commodities</option>
+                        <option value="Citrus">Citrus</option>
+                        <option value="Deciduous">Deciduous</option>
+                        <option value="Exotic">Exotic</option>
+                        <option value="Stone Fruit">Stone Fruit</option>
+                    </select>
+                    <select id="marketFilter">
+                        <option value="all">All markets</option>
+                        <option value="EU">EU</option>
+                        <option value="UK">UK</option>
+                        <option value="USA">USA</option>
+                        <option value="Middle East">Middle East</option>
+                        <option value="Far East">Far East</option>
+                    </select>
+                </div>
+            </header>
+
+            <!-- OVERVIEW SECTION -->
+            <section id="section-overview" class="section visible">
+                <h2>Operational Overview</h2>
+                <div class="cards-grid" id="overviewCards"></div>
+
+                <div class="grid-2">
+                    <div class="panel">
+                        <h3>Cold Chain Status Snapshot</h3>
+                        <div id="tempSummary"></div>
                     </div>
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="user-details">
-                            <span class="user-name">Global Exports Inc.</span>
-                            <span class="user-plan">Enterprise Plan</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <nav class="dashboard-nav">
-            <div class="nav-left">
-                <a href="#" class="nav-item active" data-view="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" data-view="analytics">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="#" class="nav-item" data-view="reports">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Reports</span>
-                </a>
-            </div>
-            
-            <div class="nav-right">
-                <button class="btn btn-primary btn-sm" id="newShipmentBtn">
-                    <i class="fas fa-plus"></i> New Shipment
-                </button>
-                <button class="btn btn-secondary btn-sm" id="exportData">
-                    <i class="fas fa-download"></i> Export
-                </button>
-            </div>
-        </nav>
-    </header>
- 
-    <!-- ===== MAIN DASHBOARD LAYOUT ===== -->
-    <div class="dashboard-container">
-        <!-- ===== STATS OVERVIEW WITH SUMMARY VIEWS ===== -->
-        <section class="stats-overview">
-            <div class="stat-card" data-filter="active-containers" data-summary="containers">
-                <div class="stat-icon">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">24</div>
-                    <div class="stat-label">Active Containers</div>
-                    <div class="stat-sub">8 Clients • 12 Products</div>
-                </div>
-                <div class="stat-action">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card" data-filter="active-vessels" data-summary="vessels">
-                <div class="stat-icon">
-                    <i class="fas fa-ship"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">8</div>
-                    <div class="stat-label">Active Vessels</div>
-                    <div class="stat-sub">3 Delayed • 5 On Time</div>
-                </div>
-                <div class="stat-action">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card" data-filter="temp-ok" data-summary="temperature">
-                <div class="stat-icon">
-                    <i class="fas fa-temperature-low"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">22</div>
-                    <div class="stat-label">Temp OK</div>
-                    <div class="stat-sub">2 Alerts • 0 Critical</div>
-                </div>
-                <div class="stat-action">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card" data-filter="on-schedule" data-summary="schedule">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">18</div>
-                    <div class="stat-label">On Schedule</div>
-                    <div class="stat-sub">6 Delayed • 92% OTIF</div>
-                </div>
-                <div class="stat-action">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
-            
-            <div class="stat-card" data-filter="docs-complete" data-summary="documents">
-                <div class="stat-icon">
-                    <i class="fas fa-file-check"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value">92%</div>
-                    <div class="stat-label">Docs Complete</div>
-                    <div class="stat-sub">144/156 Documents</div>
-                </div>
-                <div class="stat-action">
-                    <i class="fas fa-chevron-right"></i>
-                </div>
-            </div>
-        </section>
- 
-        <!-- ===== SUMMARY MODAL (Opens when stats are clicked) ===== -->
-        <div class="modal" id="summaryModal">
-            <div class="modal-content modal-extra-large">
-                <div class="modal-header">
-                    <h3><i class="fas fa-list"></i> <span id="summaryTitle">Summary Details</span></h3>
-                    <button class="modal-close" id="closeSummaryModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="summary-content" id="summaryContent">
-                        <!-- Content loaded dynamically -->
+                    <div class="panel">
+                        <h3>Regulatory Status Snapshot</h3>
+                        <div id="regSummary"></div>
                     </div>
                 </div>
-            </div>
-        </div>
- 
-        <!-- ===== MAIN CONTENT AREA ===== -->
-        <div class="main-content">
-            <!-- LEFT COLUMN: MAP & VESSELS -->
-            <div class="content-left">
-                <!-- Live Vessel Tracking -->
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-map-marked-alt"></i> Live Vessel Tracking</h2>
-                        <div class="section-actions">
-                            <button class="btn btn-secondary btn-sm" id="refreshVessels">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                            <button class="btn btn-secondary btn-sm" id="fullScreenMap">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="map-container">
-                        <div id="vesselMap"></div>
-                        <div class="map-legend">
-                            <h4><i class="fas fa-key"></i> Legend</h4>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #10b981;"></span>
-                                <span>On Schedule</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #f59e0b;"></span>
-                                <span>Delayed</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #ef4444;"></span>
-                                <span>Critical</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Vessel Quick Stats -->
-                    <div class="vessel-stats">
-                        <div class="vessel-stat">
-                            <span class="stat-label">Active Voyages</span>
-                            <span class="stat-value">8</span>
-                        </div>
-                        <div class="vessel-stat">
-                            <span class="stat-label">Average Speed</span>
-                            <span class="stat-value">18.5 kts</span>
-                        </div>
-                        <div class="vessel-stat">
-                            <span class="stat-label">Nearest ETA</span>
-                            <span class="stat-value">2 days</span>
-                        </div>
-                        <div class="vessel-stat">
-                            <span class="stat-label">Total TEU</span>
-                            <span class="stat-value">12,450</span>
-                        </div>
-                    </div>
+            </section>
+
+            <!-- SHIPMENTS SECTION -->
+            <section id="section-shipments" class="section">
+                <h2>Shipments</h2>
+                <p class="section-intro">
+                    Track shipments across commodities with PPECB and DALRRD/eCert status visibility.
+                </p>
+                <div class="table-wrapper">
+                    <table class="data-table" id="shipmentsTable">
+                        <thead>
+                            <tr>
+                                <th>Shipment</th>
+                                <th>Container</th>
+                                <th>Commodity</th>
+                                <th>Market</th>
+                                <th>PPECB</th>
+                                <th>DALRRD / eCert</th>
+                                <th>Cold Chain</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-                
-                <!-- Client Load Reference Summary -->
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-users"></i> Client Load References</h2>
-                        <button class="btn btn-secondary btn-sm" id="viewAllClients">
-                            View All
-                        </button>
-                    </div>
-                    
-                    <div class="client-list" id="clientList">
-                        <!-- Client cards loaded by JavaScript -->
-                    </div>
+            </section>
+
+            <!-- TEMPERATURES SECTION -->
+            <section id="section-temperatures" class="section">
+                <h2>Cold Chain Monitoring</h2>
+                <p class="section-intro">
+                    Commodity-based temperature visibility for containers under your control.
+                </p>
+                <div class="table-wrapper">
+                    <table class="data-table" id="temperaturesTable">
+                        <thead>
+                            <tr>
+                                <th>Container</th>
+                                <th>Commodity</th>
+                                <th>Target Range (°C)</th>
+                                <th>Current Avg (°C)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-            </div>
-            
-            <!-- RIGHT COLUMN: ANALYTICS & DOCUMENTS -->
-            <div class="content-right">
-                <!-- Analytics Dashboard -->
-                <div class="dashboard-section analytics-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-chart-line"></i> Market Analytics</h2>
-                        <select id="commodityFilter" class="analytics-filter">
-                            <option value="all">All Commodities</option>
-                            <option value="fruits">Fresh Fruits</option>
-                            <option value="seafood">Seafood</option>
-                            <option value="pharma">Pharmaceuticals</option>
-                            <option value="floral">Floral</option>
-                        </select>
-                    </div>
-                    
-                    <div class="analytics-grid">
-                        <div class="analytics-card">
-                            <div class="analytics-header">
-                                <h4><i class="fas fa-money-bill-wave"></i> Market Prices</h4>
-                                <span class="analytics-trend positive">+3.2%</span>
-                            </div>
-                            <div class="analytics-chart" id="priceChart"></div>
-                        </div>
-                        
-                        <div class="analytics-card">
-                            <div class="analytics-header">
-                                <h4><i class="fas fa-ship"></i> Freight Rates</h4>
-                                <span class="analytics-trend negative">-1.5%</span>
-                            </div>
-                            <div class="analytics-chart" id="freightChart"></div>
-                        </div>
-                        
-                        <div class="analytics-card">
-                            <div class="analytics-header">
-                                <h4><i class="fas fa-thermometer-half"></i> Temperature Insights</h4>
-                                <span class="analytics-trend positive">+0.8°C avg</span>
-                            </div>
-                            <div class="analytics-chart" id="tempChart"></div>
-                        </div>
-                        
-                        <div class="analytics-card">
-                            <div class="analytics-header">
-                                <h4><i class="fas fa-calendar-check"></i> Schedule Performance</h4>
-                                <span class="analytics-trend positive">+5% OTIF</span>
-                            </div>
-                            <div class="analytics-chart" id="scheduleChart"></div>
-                        </div>
-                    </div>
+                <p class="hint">
+                    *Temperature targets based on PPECB guidance. Always confirm requirements per
+                    market and protocol.
+                </p>
+            </section>
+
+            <!-- DOCUMENTS SECTION -->
+            <section id="section-documents" class="section">
+                <h2>Document Vault</h2>
+                <p class="section-intro">
+                    Central access to PPECB inspection reports, DALRRD/eCert documents and exporter
+                    paperwork per shipment.
+                </p>
+                <div class="table-wrapper">
+                    <table class="data-table" id="documentsTable">
+                        <thead>
+                            <tr>
+                                <th>Shipment</th>
+                                <th>Container</th>
+                                <th>Document Type</th>
+                                <th>Status</th>
+                                <th>Download</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-                
-                <!-- Documents Progress -->
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-file-alt"></i> Document Progress</h2>
-                        <button class="btn btn-secondary btn-sm" id="refreshDocs">
-                            <i class="fas fa-redo"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="documents-progress">
-                        <div class="progress-summary">
-                            <div class="progress-item">
-                                <div class="progress-label">Bill of Lading</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 95%"></div>
-                                </div>
-                                <div class="progress-value">95%</div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-label">Cert of Origin</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 88%"></div>
-                                </div>
-                                <div class="progress-value">88%</div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-label">Phytosanitary</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 92%"></div>
-                                </div>
-                                <div class="progress-value">92%</div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-label">Health Cert</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 85%"></div>
-                                </div>
-                                <div class="progress-value">85%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="documents-actions">
-                            <button class="btn btn-primary btn-sm" id="uploadMissing">
-                                <i class="fas fa-upload"></i> Upload Missing
-                            </button>
-                            <button class="btn btn-secondary btn-sm" id="generateReports">
-                                <i class="fas fa-file-export"></i> Generate Reports
-                            </button>
-                        </div>
-                    </div>
+            </section>
+
+            <!-- NOTIFICATIONS SECTION -->
+            <section id="section-notifications" class="section">
+                <h2>Notifications</h2>
+                <ul id="notificationsList" class="notification-list"></ul>
+            </section>
+
+            <!-- HELP SECTION -->
+            <section id="section-help" class="section">
+                <h2>Help & FAQs</h2>
+                <div class="faq">
+                    <details>
+                        <summary>How are PPECB statuses updated in this system?</summary>
+                        <p>
+                            PA-CryoChain reflects PPECB statuses based on official inspection
+                            results, NCRs and cooling confirmations received from PPECB and your own
+                            operational records. This system does not replace official PPECB
+                            communications.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>How are DALRRD/eCert statuses updated?</summary>
+                        <p>
+                            DALRRD and eCert statuses are updated once phytosanitary certificates,
+                            approvals and related documentation are received. For legal or
+                            regulatory questions, please confirm directly with DALRRD.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>Which commodities are supported?</summary>
+                        <p>
+                            PA-CryoChain currently supports citrus, deciduous, exotic and stone
+                            fruit types, with commodity-based temperature targets and workflow
+                            logic.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>Who do I contact for support?</summary>
+                        <p>
+                            Please contact your operations team or PA support for assistance. You
+                            may also log a query through your usual communication channels.
+                        </p>
+                    </details>
                 </div>
-                
-                <!-- Quick Insights -->
-                <div class="dashboard-section insights-section">
-                    <h3><i class="fas fa-lightbulb"></i> Quick Insights</h3>
-                    <div class="insights-list" id="insightsList">
-                        <!-- Insights loaded by JavaScript -->
-                    </div>
+            </section>
+
+            <!-- PPECB & DALRRD SECTION (INTERNAL ONLY) -->
+            <section id="section-ppecbDalrrd" class="section">
+                <h2>PPECB & DALRRD Tracking (Internal)</h2>
+                <p class="section-intro">
+                    Internal view of inspections, NCRs, cooling status and DALRRD/eCert progress.
+                </p>
+                <div class="table-wrapper">
+                    <table class="data-table" id="regTable">
+                        <thead>
+                            <tr>
+                                <th>Shipment</th>
+                                <th>Container</th>
+                                <th>Commodity</th>
+                                <th>PPECB Stage</th>
+                                <th>PPECB Notes</th>
+                                <th>DALRRD / eCert Stage</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <!-- CLIENTS SECTION (INTERNAL ONLY) -->
+            <section id="section-clients" class="section">
+                <h2>Client Accounts (Internal)</h2>
+                <p>Placeholder for managing client/exporter profiles and access.</p>
+            </section>
+
+            <!-- REPORTS SECTION (INTERNAL ONLY) -->
+            <section id="section-reports" class="section">
+                <h2>Reports (Internal)</h2>
+                <p>
+                    Future module: export cold chain compliance reports, seasonal performance and
+                    NCR analytics by commodity and market.
+                </p>
+            </section>
+
+            <!-- ADMIN SECTION (INTERNAL ONLY) -->
+            <section id="section-admin" class="section">
+                <h2>Admin (Internal)</h2>
+                <p>Placeholder for user management, role assignments and system configuration.</p>
+            </section>
+        </main>
     </div>
- 
-    <!-- ===== CONTAINER DETAIL MODAL ===== -->
-    <div class="modal" id="containerModal">
-        <div class="modal-content modal-extra-large">
-            <div class="modal-header">
-                <h3><i class="fas fa-box"></i> <span id="containerModalTitle">Container Details</span></h3>
-                <div class="modal-actions">
-                    <button class="btn btn-secondary btn-sm" id="printContainer">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                    <button class="btn btn-primary btn-sm" id="shareContainer">
-                        <i class="fas fa-share"></i> Share
-                    </button>
-                    <button class="modal-close" id="closeContainerModal">&times;</button>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div class="container-modal-tabs">
-                    <button class="tab-btn active" data-tab="journey">Journey Timeline</button>
-                    <button class="tab-btn" data-tab="documents">Documents</button>
-                    <button class="tab-btn" data-tab="temperature">Temperature Log</button>
-                    <button class="tab-btn" data-tab="messages">Messages</button>
-                    <button class="tab-btn" data-tab="analytics">Market Analytics</button>
-                </div>
-                
-                <div class="tab-content active" id="journeyTab">
-                    <!-- Journey timeline content -->
-                </div>
-                
-                <div class="tab-content" id="documentsTab">
-                    <!-- Documents content -->
-                </div>
-                
-                <div class="tab-content" id="temperatureTab">
-                    <!-- Temperature content -->
-                </div>
-                
-                <div class="tab-content" id="messagesTab">
-                    <!-- Messages content -->
-                </div>
-                
-                <div class="tab-content" id="analyticsTab">
-                    <!-- Analytics content -->
-                </div>
-            </div>
-        </div>
-    </div>
- 
-    <!-- ===== NOTIFICATIONS PANEL ===== -->
-    <div class="notifications-panel" id="notificationsPanel">
-        <div class="notifications-header">
-            <h3><i class="fas fa-bell"></i> Notifications</h3>
-            <button class="btn-icon" id="closeNotifications">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="notifications-list" id="notificationsList">
-            <!-- Notifications loaded by JavaScript -->
-        </div>
-    </div>
- 
-    <!-- ===== NEW SHIPMENT MODAL ===== -->
-    <div class="modal" id="newShipmentModal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h3><i class="fas fa-plus-circle"></i> Create New Shipment</h3>
-                <button class="modal-close" id="closeNewShipment">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="new-shipment-form" id="newShipmentForm">
-                    <!-- Form loaded by JavaScript -->
-                </div>
-            </div>
-        </div>
-    </div>
- 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="dashboard.js"></script>
 </body>
 </html>
