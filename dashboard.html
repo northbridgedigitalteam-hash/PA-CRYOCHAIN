@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PA-CryoChain dashboard demo — consignments, vessels, shipments and file-level view." />
     <title>PA-CryoChain | Dashboard</title>
 
     <!-- Dashboard styles -->
-    dashboard.css
+    <link rel="stylesheet" href="dashboard.css" />
 
     <!-- Leaflet CSS for map -->
     <link
@@ -18,13 +19,13 @@
 </head>
 <body class="consignment-body">
     <!-- Top green bar -->
-    <header class="main-header">
+    <header class="main-header" role="banner">
         <div class="header-left">
-            <div class="logo-inline">
+            <div class="logo-inline" aria-hidden="true">
                 <span class="logo-symbol">❄️🍎🍊</span>
                 <span class="logo-title">PA-CryoChain</span>
             </div>
-            <nav class="top-nav">
+            <nav class="top-nav" role="navigation" aria-label="Main">
                 <a href="#" class="nav-link active" data-view="summary">home</a>
                 <a href="#" class="nav-link" data-view="bookings">bookings</a>
                 <a href="#" class="nav-link" data-view="reports">reports</a>
@@ -32,14 +33,14 @@
             </nav>
         </div>
         <div class="header-right">
-            <span id="headerYear" class="header-badge"></span>
-            <span id="headerUser" class="header-user"></span>
+            <span id="headerYear" class="header-badge" aria-hidden="true"></span>
+            <span id="headerUser" class="header-user" aria-live="polite"></span>
             <button id="logoutBtn" class="header-icon-btn" title="Log out">⎋</button>
         </div>
     </header>
 
     <!-- Consignment bar (used when file view is active) -->
-    <section class="consignment-bar" id="consignmentBar">
+    <section class="consignment-bar" id="consignmentBar" hidden>
         <div>
             <h1 id="consignmentTitle">Consignment</h1>
             <p id="consignmentSub" class="consignment-sub"></p>
@@ -52,7 +53,7 @@
         </div>
     </section>
 
-    <main id="mainContent">
+    <main id="mainContent" role="main">
         <!-- ======================== SUMMARY DASHBOARD VIEW ======================== -->
         <section id="view-summary">
             <div class="panel">
@@ -60,10 +61,7 @@
                     <h2>Exporter Summary Dashboard</h2>
                 </div>
                 <div class="panel-body">
-                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
-                        Overview of consignments, vessels and shipments on route. Click on a
-                        consignment reference to open the file dashboard.
-                    </p>
+                    <p class="muted">Overview of consignments, vessels and shipments on route. Click on a consignment reference to open the file dashboard.</p>
                 </div>
             </div>
 
@@ -72,7 +70,8 @@
                     <h3>Consignments</h3>
                 </div>
                 <div class="panel-body">
-                    <table class="status-table" id="summaryConsignments">
+                    <table class="status-table" id="summaryConsignments" aria-describedby="consignmentsDesc">
+                        <caption id="consignmentsDesc" class="visually-hidden">List of consignments</caption>
                         <thead>
                             <tr>
                                 <th>Consignment Ref</th>
@@ -141,29 +140,22 @@
                     <h3>Delays & Disruptions</h3>
                 </div>
                 <div class="panel-body">
-                    <ul id="summaryDelays" style="padding-left: 18px; font-size: 0.78rem;">
+                    <ul id="summaryDelays" class="muted-list">
                         <!-- Filled by JS -->
                     </ul>
-                    <p class="upload-note">
-                        Demo data only. In a production system, this panel could aggregate updates
-                        from Transnet, port authority notices and marine news sources (e.g. Splash
-                        247) for the routes relevant to your shipments.
-                    </p>
+                    <p class="upload-note muted">Demo data only. In a production system, this panel could aggregate updates from port authorities and marine news sources for relevant routes.</p>
                 </div>
             </div>
         </section>
 
         <!-- ======================== BOOKINGS VIEW ======================== -->
-        <section id="view-bookings" style="display: none;">
+        <section id="view-bookings" hidden>
             <div class="panel">
                 <div class="panel-header">
                     <h2>New Booking Request</h2>
                 </div>
                 <div class="panel-body">
-                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
-                        Exporter can submit a new booking request to the agent. This is a front-end
-                        demo only – integrate with your email or TMS later.
-                    </p>
+                    <p class="muted">Exporter can submit a new booking request to the agent. This is a front-end demo only – integrate with your email or TMS later.</p>
 
                     <form id="bookingForm" class="upload-form" style="flex-direction: column; align-items: flex-start;">
                         <div class="form-row">
@@ -199,45 +191,33 @@
         </section>
 
         <!-- ======================== REPORTS VIEW ======================== -->
-        <section id="view-reports" style="display: none;">
+        <section id="view-reports" hidden>
             <div class="panel">
                 <div class="panel-header">
                     <h2>Reports</h2>
                 </div>
                 <div class="panel-body">
-                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
-                        Exporter and operations can pull shipment information for analysis. Below is
-                        a placeholder; later you can connect this to real exports and Excel/CSV
-                        downloads.
-                    </p>
-                    <button id="downloadReportBtn" class="btn secondary-btn">
-                        Download Summary (CSV demo)
-                    </button>
-                    <p class="upload-note">
-                        This demo creates a simple CSV based on the sample consignments loaded in
-                        the dashboard.
-                    </p>
+                    <p class="muted">Exporter and operations can pull shipment information for analysis. Below is a placeholder; later you can connect this to real exports and Excel/CSV downloads.</p>
+                    <button id="downloadReportBtn" class="btn secondary-btn">Download Summary (CSV demo)</button>
+                    <p class="upload-note muted">This demo creates a simple CSV based on the sample consignments loaded in the dashboard.</p>
                 </div>
             </div>
         </section>
 
         <!-- ======================== DATA VIEW (Placeholder) ======================== -->
-        <section id="view-data" style="display: none;">
+        <section id="view-data" hidden>
             <div class="panel">
                 <div class="panel-header">
                     <h2>Data & Analytics</h2>
                 </div>
                 <div class="panel-body">
-                    <p style="font-size: 0.82rem; color: #6b7280; margin-top: 0;">
-                        Placeholder for future data tools – e.g. seasonal cold chain performance,
-                        PPECB pass rates, DALRRD/eCert turnaround times per exporter and commodity.
-                    </p>
+                    <p class="muted">Placeholder for future data tools – e.g. seasonal cold chain performance, PPECB pass rates, DALRRD/eCert turnaround times per exporter and commodity.</p>
                 </div>
             </div>
         </section>
 
         <!-- ======================== FILE / CONSIGNMENT VIEW ======================== -->
-        <section id="view-file" style="display: none;">
+        <section id="view-file" hidden>
             <section class="consignment-layout">
                 <!-- LEFT COLUMN -->
                 <section class="left-column">
@@ -414,12 +394,9 @@
                             <h2>Container Location</h2>
                         </div>
                         <div class="panel-body">
-                            <div id="map" class="map-container"></div>
+                            <div id="map" class="map-container" aria-label="Container map"></div>
                             <p id="mapMeta" class="map-meta"></p>
-                            <p class="map-note">
-                                Demo map using OpenStreetMap. For live positions, integrate with your
-                                container tracking provider or marine traffic API.
-                            </p>
+                            <p class="map-note muted">Demo map using OpenStreetMap. For live positions, integrate with your container tracking provider or marine traffic API.</p>
                         </div>
                     </div>
 
@@ -429,14 +406,8 @@
                             <h2>Delays & Disruptions</h2>
                         </div>
                         <div class="panel-body">
-                            <ul id="fileDelays" style="padding-left: 18px; font-size: 0.78rem;">
-                                <!-- Filled by JS -->
-                            </ul>
-                            <p class="upload-note">
-                                In production, this could draw from Transnet notices, port authority
-                                alerts and marine news (e.g. Splash 247) filtered for this vessel /
-                                route.
-                            </p>
+                            <ul id="fileDelays" class="muted-list"></ul>
+                            <p class="upload-note muted">In production, this could draw from port authority alerts filtered for this vessel / route.</p>
                         </div>
                     </div>
 
@@ -449,9 +420,7 @@
                             <form id="uploadForm" class="upload-form">
                                 <label for="docUpload" class="upload-label">Upload documents</label>
                                 <input type="file" id="docUpload" multiple />
-                                <button type="submit" class="btn secondary-btn">
-                                    Add to Consignment
-                                </button>
+                                <button type="submit" class="btn secondary-btn">Add to Consignment</button>
                             </form>
                             <table class="status-table" id="docTable">
                                 <thead>
@@ -464,10 +433,7 @@
                                 </thead>
                                 <tbody></tbody>
                             </table>
-                            <p class="upload-note">
-                                On GitHub Pages, files are stored in-browser only for this session.
-                                A backend is required for shared document storage.
-                            </p>
+                            <p class="upload-note muted">On GitHub Pages, files are stored in-browser only for this session. A backend is required for shared document storage.</p>
                         </div>
                     </div>
 
@@ -477,17 +443,10 @@
                             <h2>Messages on this File</h2>
                         </div>
                         <div class="panel-body">
-                            <ul id="messageList" style="padding-left: 18px; font-size: 0.78rem;">
-                                <!-- Filled by JS -->
-                            </ul>
+                            <ul id="messageList" class="muted-list"></ul>
                             <form id="messageForm" class="upload-form" style="margin-top: 6px; flex-direction: column; align-items: flex-start;">
                                 <label for="messageText" class="upload-label">Post a message</label>
-                                <textarea
-                                    id="messageText"
-                                    rows="3"
-                                    style="width: 100%; font-size: 0.8rem;"
-                                    placeholder="Add an update or question about this shipment..."
-                                ></textarea>
+                                <textarea id="messageText" rows="3" style="width: 100%; font-size: 0.8rem;" placeholder="Add an update or question about this shipment..."></textarea>
                                 <button type="submit" class="btn secondary-btn">Post Message</button>
                             </form>
                         </div>
@@ -498,19 +457,15 @@
     </main>
 
     <footer class="consignment-footer">
-        <p>
-            PA-CryoChain • PPECB-aligned • DALRRD documentation compliant • For operational
-            visibility and training only – always verify with official PPECB & DALRRD records.
-        </p>
+        <p>PA-CryoChain • PPECB-aligned • DALRRD documentation compliant • For operational visibility and training only – always verify with official PPECB & DALRRD records.</p>
     </footer>
 
     <!-- Leaflet JS for map -->
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9WjUyl8aI1ty0qSgCqo="
-        crossorigin=""
-    ></script>
+        crossorigin=""></script>
+
     <!-- Dashboard behaviour -->
-    dashboard.js</script>
+    <script defer src="dashboard.js"></script>
 </body>
 </html>
