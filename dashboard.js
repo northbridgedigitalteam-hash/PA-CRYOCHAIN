@@ -1,274 +1,441 @@
+/* dashboard.js
+   Implements dashboard behaviour: navigation, sample data rendering, map, bookings, uploads & messages.
+   Uses localStorage for demo persistence.
+*/
 document.addEventListener("DOMContentLoaded", () => {
-    // Redirect to login if not "logged in"
-    const userRaw = localStorage.getItem("paCryoUser");
-    if (!userRaw) {
-        window.location.href = "index.html";
-        return;
+  // Utilities
+  const qs = (s, ctx = document) => ctx.querySelector(s);
+  const qsa = (s, ctx = document) => Array.from(ctx.querySelectorAll(s));
+  const fmtDate = (iso) => {
+    if (!iso) return "";
+    const d = new Date(iso);
+    return d.toLocaleString();
+  };
+  const fmtBytes = (n) => {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024*1024) return `${(n/1024).toFixed(1)} KB`;
+    return `${(n/1024/1024).toFixed(1)} MB`;
+  };
+
+  // Ensure signed-in user
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem("paCryoUser") || "null");
+  } catch(e){ user = null; }
+  if (!user) {
+    // not signed in — send back to login
+    window.location.replace("index.html");
+    return;
+  }
+
+  // UI elements
+  const headerYear = qs("#headerYear");
+  const headerUser = qs("#headerUser");
+  const logoutBtn = qs("#logoutBtn");
+  const navLinks = qsa(".nav-link");
+  const views = {
+    summary: qs("#view-summary"),
+    bookings: qs("#view-bookings"),
+    reports: qs("#view-reports"),
+    data: qs("#view-data"),
+    file: qs("#view-file"),
+  };
+  const consignmentBar = qs("#consignmentBar");
+
+  // Set header info
+  if (headerYear) headerYear.textContent = new Date().getFullYear();
+  if (headerUser) headerUser.textContent = user.username || user.role;
+
+  logoutBtn?.addEventListener("click", () => {
+    localStorage.removeItem("paCryoUser");
+    // preserve demo data but remove session
+    window.location.replace("index.html");
+  });
+
+  // Sample data (demo only) — could be replaced by API fetch
+  const SAMPLE_CONSIGNMENTS = [
+    {
+      id: "C001",
+      ref: "PA-0001",
+      container: "ZCSU1234567",
+      commodity: "Citrus - Navel",
+      market: "Rotterdam, NL",
+      status: "On vessel",
+      etd: "2026-02-01T08:00:00Z",
+      eta: "2026-02-28T10:00:00Z",
+      vessel: "COLDSEA 12",
+      pol: "Ngqura",
+      pod: "Rotterdam",
+      coords: { lat: -33.916, lng: 25.621 }, // example coord (SA)
+      ppecbStatus: "Passed",
+      dalrrdStatus: "Issued",
+      tempTarget: "-0.5°C to 2°C",
+      tempAvg: "1.1°C",
+      lastUpdated: new Date().toISOString(),
+      exportNotes: "Handle with care; check canopy before stuffing.",
+      bookingRef: "BK-4271",
+      shippingLine: "CryoLine",
+      containerType: "Reefer 40'",
+      tasks: [
+        { task: "Load container", status: "Done", date: "2026-01-28T09:00:00Z" },
+        { task: "PPECB inspection", status: "Passed", date: "2026-01-29T11:20:00Z" }
+      ],
+      docs: [
+        { name: "PackingList.pdf", size: 183000, type: "application/pdf" }
+      ],
+      messages: [
+        { author: "exporter@example.com", text: "Container stuffed, ready for collection.", time: new Date().toISOString() }
+      ],
+      delays: ["Vessel scheduled; minor berthing delays at POL expected."]
+    },
+    {
+      id: "C002",
+      ref: "PA-0002",
+      container: "ZCSU2345678",
+      commodity: "Stone Fruit - Apricot",
+      market: "Genoa, IT",
+      status: "At port (Ngqura)",
+      etd: "2026-02-03T06:00:00Z",
+      eta: "2026-02-25T09:00:00Z",
+      vessel: "FRIGOPAC 7",
+      pol: "Ngqura",
+      pod: "Genoa",
+      coords: { lat: -34.020, lng: 25.617 },
+      ppecbStatus: "Pending",
+      dalrrdStatus: "Pending",
+      tempTarget: "0°C to 3°C",
+      tempAvg: "2.5°C",
+      lastUpdated: new Date().toISOString(),
+      exportNotes: "Ensure correct cold chain at reefer yard.",
+      bookingRef: "BK-4272",
+      shippingLine: "SafeLine",
+      containerType: "Reefer 20'",
+      tasks: [],
+      docs: [],
+      messages: [],
+      delays: []
     }
-    const user = JSON.parse(userRaw);
+  ];
 
-    // Header info
-    const headerYear = document.getElementById("headerYear");
-    const headerUser = document.getElementById("headerUser");
-    const logoutBtn = document.getElementById("logoutBtn");
+  // persist sample consignments to localStorage if not present (demo initial data)
+  if (!localStorage.getItem("paCryo_sampleData")) {
+    try {
+      localStorage.setItem("paCryo_sampleData", JSON.stringify(SAMPLE_CONSIGNMENTS));
+    } catch (e) { console.warn("Unable to persist sample data"); }
+  }
 
-    headerYear.textContent = new Date().getFullYear();
-    headerUser.textContent = `${user.username} (${user.role === "internal" ? "Internal" : "Client"})`;
+  const getSampleData = () => {
+    try {
+      return JSON.parse(localStorage.getItem("paCryo_sampleData") || "[]");
+    } catch(e){ return SAMPLE_CONSIGNMENTS; }
+  };
 
-    logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("paCryoUser");
-        window.location.href = "index.html";
+  // NAV handling
+  function showView(name) {
+    Object.values(views).forEach(v => v.hidden = true);
+    if (views[name]) views[name].hidden = false;
+    // update nav active
+    navLinks.forEach(n => n.classList.toggle("active", n.dataset.view === name));
+  }
+  navLinks.forEach(a => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const view = a.dataset.view;
+      showView(view);
+      // update hash so reloads can land on a view
+      history.replaceState({}, "", `#${view}`);
+    });
+  });
+
+  // Start on hash or default summary
+  const initialHash = (location.hash || "#exporter").replace("#", "");
+  showView(initialHash === "internal" ? "summary" : "summary");
+
+  // Populate summary tables
+  function renderSummary() {
+    const consignments = getSampleData();
+    const tbody = qs("#summaryConsignments tbody");
+    tbody.innerHTML = "";
+    consignments.forEach(c => {
+      const tr = document.createElement("tr");
+      tr.tabIndex = 0;
+      tr.dataset.ref = c.id;
+      tr.innerHTML = `
+        <td><button class="link-like open-file" data-ref="${c.id}">${c.ref}</button></td>
+        <td>${c.container}</td>
+        <td>${c.commodity}</td>
+        <td>${c.market}</td>
+        <td>${c.status}</td>
+        <td>${new Date(c.etd).toLocaleDateString()}</td>
+        <td>${new Date(c.eta).toLocaleDateString()}</td>
+      `;
+      tbody.appendChild(tr);
     });
 
-    // ------------------ DEMO CONSIGNMENT DATA ------------------
+    // Vessels
+    const vesselTbody = qs("#summaryVessels tbody");
+    vesselTbody.innerHTML = "";
+    const vessels = {};
+    consignments.forEach(c => {
+      const key = `${c.vessel}`;
+      vessels[key] = vessels[key] || { vessel: c.vessel, pol: c.pol, pod: c.pod, etd: c.etd, eta: c.eta, count: 0 };
+      vessels[key].count += 1;
+    });
+    Object.values(vessels).forEach(v => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${v.vessel}</td><td>${v.pol}</td><td>${v.pod}</td><td>${new Date(v.etd).toLocaleDateString()}</td><td>${new Date(v.eta).toLocaleDateString()}</td><td>${v.count}</td>`;
+      vesselTbody.appendChild(tr);
+    });
 
-    const consignment = {
-        id: "FRH60022",
-        consignee: "PORT INTERNATIONAL EUROPEAN SOURCING GMBH",
-        exporter: "GREEN FIELDS EXPORTERS (PTY) LTD",
-        notifyParty: "PORT INTERNATIONAL EUROPEAN SOURCING GMBH",
-        clientRef: "PIE/2026/FRH60022",
-        containerNo: "MSCU1234567",
-        commodity: "Soft Citrus – Clementines",
-        marketDest: "EUROPE • ROTTERDAM, NETHERLANDS",
-        ppecbStatus: "Inspection Passed – Cooling Authorised",
-        dalrrdStatus: "Phyto Approved – eCert Completed",
-        coldChainStatus: "Compliant – within soft citrus EU spec",
-        tempTarget: "-0.5°C to 0.0°C",
-        tempAvg: 0.1,
-        lastUpdated: "2026-02-01 16:30 SAST",
-        incoterms: "CFR – Reefer Container",
-        exportNotes: [
-            "1. Exporter: GREEN FIELDS EXPORTERS (PTY) LTD.",
-            "2. Product: Class 1 Soft Citrus – Clementines packed in 15kg cartons.",
-            "3. Market: EU – Rotterdam. CBS protocol applicable.",
-            "4. PPECB inspection completed and passed. No NCR issued.",
-            "5. DALRRD phytosanitary certificate issued via eCert. Original to consignment docs.",
-            "6. Container pre-cooled and shipped in good order.",
-            "7. Monitor cold chain from depot to vessel – any deviations >0.5°C to be escalated."
-        ].join("\n"),
+    // Shipments on route
+    const shipTbody = qs("#summaryShipments tbody");
+    shipTbody.innerHTML = "";
+    consignments.forEach(c => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${c.ref}</td><td>${c.container}</td><td>${c.pol}</td><td>${c.tempAvg || "—"}</td><td>${(c.delays && c.delays.length) ? "Possible delay" : "OK"}</td>`;
+      shipTbody.appendChild(tr);
+    });
 
-        tasks: [
-            {
-                task: "PPECB Inspection",
-                status: "Completed",
-                severity: "ok",
-                owner: "PPECB Inspector"
-            },
-            {
-                task: "DALRRD / eCert Application",
-                status: "Completed",
-                severity: "ok",
-                owner: "Export Docs Team"
-            },
-            {
-                task: "Commercial Invoice & Packing List",
-                status: "Completed",
-                severity: "ok",
-                owner: "Exporter"
-            },
-            {
-                task: "VGM / Weighbridge",
-                status: "Pending Confirmation",
-                severity: "warn",
-                owner: "Depot"
-            }
-        ],
+    // Delays
+    const delaysEl = qs("#summaryDelays");
+    delaysEl.innerHTML = "";
+    consignments.flatMap(c => c.delays || []).forEach(d => {
+      const li = document.createElement("li");
+      li.textContent = d;
+      delaysEl.appendChild(li);
+    });
+  }
 
-        docStatus: [
-            {
-                doc: "PPECB Inspection Report",
-                status: "Complete",
-                severity: "ok",
-                requiredBy: "Before Gate-in"
-            },
-            {
-                doc: "Phytosanitary Certificate (DALRRD)",
-                status: "Complete",
-                severity: "ok",
-                requiredBy: "Before Vessel Load"
-            },
-            {
-                doc: "Commercial Invoice",
-                status: "Complete",
-                severity: "ok",
-                requiredBy: "Before Customs"
-            },
-            {
-                doc: "Packing List",
-                status: "In Progress",
-                severity: "warn",
-                requiredBy: "Before Gate-in"
-            }
-        ],
+  // Open file view
+  function openFile(id) {
+    const consignments = getSampleData();
+    const c = consignments.find(x => x.id === id);
+    if (!c) return;
+    // Fill left column fields
+    qs("#consignee").textContent = c.consignee || "—";
+    qs("#exporter").textContent = c.exporter || "Demo Exporter";
+    qs("#notifyParty").textContent = c.notifyParty || "—";
+    qs("#clientRef").textContent = c.ref || "—";
+    qs("#containerNo").textContent = c.container || "—";
+    qs("#commodity").textContent = c.commodity || "—";
+    qs("#marketDest").textContent = c.market || "—";
+    qs("#ppecbStatus").textContent = c.ppecbStatus || "—";
+    qs("#dalrrdStatus").textContent = c.dalrrdStatus || "—";
+    qs("#coldChainStatus").textContent = c.coldChainStatus || "Active";
+    qs("#tempTarget").textContent = c.tempTarget || "—";
+    qs("#tempAvg").textContent = c.tempAvg || "—";
+    qs("#lastUpdated").textContent = fmtDate(c.lastUpdated);
+    qs("#incoterms").textContent = "FOB"; // demo
+    qs("#exportNotes").value = c.exportNotes || "";
 
-        bookingRef: "NB-2026-001",
-        vesselVoyage: "SANTA TERESA / 052W",
-        shippingLine: "MSC",
-        containerType: "40' HC Reefer",
-        pol: "Port of Ngqura (ZA NQZ)",
-        pod: "Rotterdam (NL RTM)",
-        etd: "2026-02-05",
-        eta: "2026-02-19",
+    qs("#bookingRef").textContent = c.bookingRef || "";
+    qs("#vesselVoyage").textContent = c.vessel || "";
+    qs("#shippingLine").textContent = c.shippingLine || "";
+    qs("#containerType").textContent = c.containerType || "";
+    qs("#pol").textContent = c.pol || "";
+    qs("#pod").textContent = c.pod || "";
+    qs("#etd").textContent = new Date(c.etd).toLocaleString();
+    qs("#eta").textContent = new Date(c.eta).toLocaleString();
 
-        // Map position – approx. off Port of Ngqura
-        position: {
-            lat: -33.8,
-            lng: 25.7,
-            description: "En route from Nelson Mandela Bay to Rotterdam"
-        }
-    };
+    // Tasks
+    const taskBody = qs("#taskTable tbody");
+    taskBody.innerHTML = "";
+    (c.tasks || []).forEach(t => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${t.task}</td><td>${t.status}</td><td>${fmtDate(t.date)}</td>`;
+      taskBody.appendChild(tr);
+    });
 
-    // ------------------ FILL SUMMARY FIELDS ------------------
+    // Documents (in-memory)
+    renderDocsForConsignment(c);
 
-    const el = (id) => document.getElementById(id);
+    // Messages
+    renderMessagesForConsignment(c);
 
-    el("consignmentTitle").textContent = `Consignment ${consignment.id}`;
-    el("consignmentSub").textContent =
-        "Shipment overview with PPECB, DALRRD/eCert, cold chain & documents";
+    // Delays
+    const fileDelays = qs("#fileDelays");
+    fileDelays.innerHTML = "";
+    (c.delays || []).forEach(d => {
+      const li = document.createElement("li");
+      li.textContent = d;
+      fileDelays.appendChild(li);
+    });
 
-    el("consignee").textContent = consignment.consignee;
-    el("exporter").textContent = consignment.exporter;
-    el("notifyParty").textContent = consignment.notifyParty;
-    el("clientRef").textContent = consignment.clientRef;
-    el("containerNo").textContent = consignment.containerNo;
-    el("commodity").textContent = consignment.commodity;
-    el("marketDest").textContent = consignment.marketDest;
+    // Show file view
+    consignmentBar.hidden = false;
+    qs("#consignmentTitle").textContent = c.ref;
+    qs("#consignmentSub").textContent = `${c.container} • ${c.commodity} → ${c.market}`;
+    showView("file");
 
-    el("ppecbStatus").textContent = consignment.ppecbStatus;
-    el("dalrrdStatus").textContent = consignment.dalrrdStatus;
-    el("coldChainStatus").textContent = consignment.coldChainStatus;
-    el("tempTarget").textContent = consignment.tempTarget;
-    el("tempAvg").textContent = `${consignment.tempAvg.toFixed(1)}°C`;
-    el("lastUpdated").textContent = consignment.lastUpdated;
-    el("incoterms").textContent = consignment.incoterms;
-
-    el("exportNotes").value = consignment.exportNotes;
-
-    el("bookingRef").textContent = consignment.bookingRef;
-    el("vesselVoyage").textContent = consignment.vesselVoyage;
-    el("shippingLine").textContent = consignment.shippingLine;
-    el("containerType").textContent = consignment.containerType;
-    el("pol").textContent = consignment.pol;
-    el("pod").textContent = consignment.pod;
-    el("etd").textContent = consignment.etd;
-    el("eta").textContent = consignment.eta;
-
-    // ------------------ TASK & DOC STATUS TABLES ------------------
-
-    const taskTableBody = document.querySelector("#taskTable tbody");
-    const docStatusTableBody = document.querySelector("#docStatusTable tbody");
-
-    function statusPill(label, severity) {
-        let cls = "status-ok";
-        if (severity === "warn") cls = "status-warn";
-        if (severity === "bad") cls = "status-bad";
-        return `<span class="status-pill ${cls}">${label}</span>`;
+    // Map: set view and marker
+    if (window.L && c.coords) {
+      try {
+        initMap(c.coords, `${c.container} (${c.ref})`);
+      } catch (e) { console.warn(e); }
     }
+    // store current open consignment id
+    sessionStorage.setItem("paCryo_currentFile", c.id);
+  }
 
-    taskTableBody.innerHTML = consignment.tasks
-        .map(
-            (t) => `
-        <tr>
-            <td>${t.task}</td>
-            <td>${statusPill(t.status, t.severity)}</td>
-            <td>${t.owner}</td>
-        </tr>
-    `
-        )
-        .join("");
+  // Click handler for opening file from table
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".open-file");
+    if (btn) {
+      const id = btn.dataset.ref;
+      openFile(id);
+    }
+  });
 
-    docStatusTableBody.innerHTML = consignment.docStatus
-        .map(
-            (d) => `
-        <tr>
-            <td>${d.doc}</td>
-            <td>${statusPill(d.status, d.severity)}</td>
-            <td>${d.requiredBy}</td>
-        </tr>
-    `
-        )
-        .join("");
+  // Bookings form
+  const bookingForm = qs("#bookingForm");
+  bookingForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const exporterRef = qs("#bkExporterRef").value.trim();
+    const commodity = qs("#bkCommodity").value.trim();
+    const volume = qs("#bkVolume").value.trim();
+    const vessel = qs("#bkVessel").value.trim();
+    const route = qs("#bkRoute").value.trim();
+    const notes = qs("#bkNotes").value.trim();
 
-    // ------------------ MAP SETUP (Leaflet) ------------------
+    const booking = { id: `BK-${Date.now()}`, exporterRef, commodity, volume, vessel, route, notes, created: new Date().toISOString() };
+    const existing = JSON.parse(localStorage.getItem("paCryo_bookings") || "[]");
+    existing.push(booking);
+    localStorage.setItem("paCryo_bookings", JSON.stringify(existing));
 
-    const map = L.map("map").setView([consignment.position.lat, consignment.position.lng], 8);
+    qs("#bookingFeedback").textContent = "Booking request saved locally (demo).";
+    bookingForm.reset();
+  });
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 18,
+  // Reports: download CSV
+  qs("#downloadReportBtn")?.addEventListener("click", () => {
+    const data = getSampleData();
+    const rows = [
+      ["ConsignmentRef","Container","Commodity","Market","Status","ETD","ETA"]
+    ];
+    data.forEach(r => rows.push([r.ref, r.container, r.commodity, r.market, r.status, r.etd, r.eta]));
+    const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pa_cryo_summary_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // Document uploads (demo)
+  const uploadForm = qs("#uploadForm");
+  function renderDocsForConsignment(c) {
+    const tbody = qs("#docTable tbody");
+    tbody.innerHTML = "";
+    const docsKey = `paCryo_docs_${c.id}`;
+    const docs = JSON.parse(localStorage.getItem(docsKey) || "[]").concat(c.docs || []);
+    docs.forEach((d, idx) => {
+      const tr = document.createElement("tr");
+      const blobUrl = d.data ? (URL.createObjectURL(dataURLtoBlob(d.data))) : "#";
+      tr.innerHTML = `<td>${d.name}</td><td>${fmtBytes(d.size||0)}</td><td>${d.type||""}</td><td>${d.data ? `<a href="${blobUrl}" download="${d.name}">Download</a>` : "-"}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  function dataURLtoBlob(dataurl) {
+    const parts = dataurl.split(',');
+    const mime = parts[0].match(/:(.*?);/)[1];
+    const bstr = atob(parts[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], {type:mime});
+  }
+  uploadForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fileInput = qs("#docUpload");
+    const files = fileInput.files;
+    const currentFileId = sessionStorage.getItem("paCryo_currentFile");
+    if (!currentFileId) {
+      alert("Open a consignment first (click a consignment reference).");
+      return;
+    }
+    const docsKey = `paCryo_docs_${currentFileId}`;
+    const stored = JSON.parse(localStorage.getItem(docsKey) || "[]");
+    // read files as data URLs for demo download
+    const readers = Array.from(files).map(f => new Promise((res) => {
+      const r = new FileReader();
+      r.onload = () => res({ name: f.name, size: f.size, type: f.type, data: r.result });
+      r.readAsDataURL(f);
+    }));
+    Promise.all(readers).then(results => {
+      const merged = stored.concat(results);
+      localStorage.setItem(docsKey, JSON.stringify(merged));
+      // re-render
+      const consignments = getSampleData();
+      const c = consignments.find(x => x.id === currentFileId);
+      if (c) renderDocsForConsignment(c);
+      qs("#docUpload").value = "";
+    });
+  });
+
+  // Messages per consignment
+  function renderMessagesForConsignment(c) {
+    const list = qs("#messageList");
+    list.innerHTML = "";
+    const key = `paCryo_msgs_${c.id}`;
+    const stored = JSON.parse(localStorage.getItem(key) || "[]");
+    const msgs = (c.messages || []).concat(stored);
+    msgs.forEach(m => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${m.author || user.username}</strong> <span class="muted">• ${fmtDate(m.time || m.created)}</span><div>${m.text}</div>`;
+      list.appendChild(li);
+    });
+  }
+  const messageForm = qs("#messageForm");
+  messageForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const txt = qs("#messageText").value.trim();
+    const currentFileId = sessionStorage.getItem("paCryo_currentFile");
+    if (!currentFileId || !txt) return;
+    const key = `paCryo_msgs_${currentFileId}`;
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    const msg = { author: user.username, text: txt, time: new Date().toISOString() };
+    existing.unshift(msg);
+    localStorage.setItem(key, JSON.stringify(existing));
+    // re-render
+    const consignments = getSampleData();
+    const c = consignments.find(x => x.id === currentFileId);
+    if (c) renderMessagesForConsignment(c);
+    qs("#messageText").value = "";
+  });
+
+  // Map init
+  let map, marker;
+  function initMap(coords, title) {
+    const mapEl = qs("#map");
+    if (!mapEl) return;
+    if (!map) {
+      map = L.map(mapEl, { scrollWheelZoom: false }).setView([coords.lat, coords.lng], 6);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
         attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
-
-    L.marker([consignment.position.lat, consignment.position.lng])
-        .addTo(map)
-        .bindPopup(
-            `<strong>Container ${consignment.containerNo}</strong><br>${consignment.position.description}`
-        )
-        .openPopup();
-
-    const mapMeta = document.getElementById("mapMeta");
-    mapMeta.textContent = `Container ${consignment.containerNo} • ${consignment.position.description} • Last update: ${consignment.lastUpdated}`;
-
-    // ------------------ DOCUMENT UPLOAD / DOWNLOAD ------------------
-
-    const uploadForm = document.getElementById("uploadForm");
-    const fileInput = document.getElementById("docUpload");
-    const docTableBody = document.querySelector("#docTable tbody");
-
-    // In-memory list of uploaded docs (per session)
-    const uploadedDocs = [];
-
-    uploadForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const files = Array.from(fileInput.files || []);
-        if (!files.length) {
-            alert("Please choose one or more files to upload.");
-            return;
-        }
-
-        files.forEach((file) => {
-            const url = URL.createObjectURL(file);
-            uploadedDocs.push({
-                name: file.name,
-                size: file.size,
-                type: file.type || "Unknown",
-                url
-            });
-        });
-
-        fileInput.value = "";
-        renderDocTable();
-    });
-
-    function renderDocTable() {
-        if (!uploadedDocs.length) {
-            docTableBody.innerHTML = `
-                <tr>
-                    <td colspan="4" style="text-align:center; color:#6b7280; font-size:0.78rem;">
-                        No documents uploaded yet. Use "Upload documents" to add files for this consignment.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        docTableBody.innerHTML = uploadedDocs
-            .map((doc, index) => {
-                const sizeKb = Math.round(doc.size / 102.4) / 10; // one decimal
-                return `
-                <tr>
-                    <td>${doc.name}</td>
-                    <td>${sizeKb} KB</td>
-                    <td>${doc.type}</td>
-                    <td>
-                        <a href="${doc.url}" download="${doc.name}">Download</a>
-                    </td>
-                </tr>
-            `;
-            })
-            .join("");
+      }).addTo(map);
+    } else {
+      map.setView([coords.lat, coords.lng], 6);
+      if (marker) marker.remove();
     }
+    marker = L.marker([coords.lat, coords.lng]).addTo(map).bindPopup(title || "").openPopup();
+    qs("#mapMeta").textContent = title ? `Position: ${coords.lat.toFixed(3)}, ${coords.lng.toFixed(3)}` : "";
+  }
 
-    // Initial doc table (empty)
-    renderDocTable();
+  // initialize UI
+  renderSummary();
+
+  // If the initial URL contained a consignment hash or session has open file, open it
+  const initialFile = sessionStorage.getItem("paCryo_currentFile");
+  if (initialFile) {
+    openFile(initialFile);
+  }
+
+  // small helper to show views (exposed to global for debugging)
+  window.paCryo = { showView, renderSummary, openFile };
+
 });
