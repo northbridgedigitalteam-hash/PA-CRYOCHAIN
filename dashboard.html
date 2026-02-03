@@ -5,18 +5,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>PA-CryoChain — Dashboard</title>
 
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Dashboard styles -->
   <link rel="stylesheet" href="dashboard.css" />
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 <body class="consignment-body">
-  <header class="main-header">
+  <header class="main-header" role="banner">
     <div class="header-left">
-      <div class="logo-inline">
+      <div class="logo-inline" aria-hidden="true">
         <span class="logo-symbol">❄️🍎🍊</span>
         <span class="logo-title">PA-CryoChain</span>
       </div>
-      <nav class="top-nav" role="navigation" aria-label="Main navigation">
+
+      <nav class="top-nav" role="navigation" aria-label="Main">
         <a href="#" class="nav-link" data-view="summary">Home</a>
         <a href="#" class="nav-link" data-view="bookings">Bookings</a>
         <a href="#" class="nav-link" data-view="reports">Reports</a>
@@ -26,15 +33,14 @@
 
     <div class="header-right">
       <span id="headerUser" class="header-user"></span>
-      <button id="logoutBtn" class="header-icon-btn" title="Log out">⎋</button>
+      <button id="logoutBtn" class="header-icon-btn" title="Log out" aria-label="Log out">⎋</button>
     </div>
   </header>
 
-  <!-- Consignment bar (visible when file open) -->
   <section id="consignmentBar" class="consignment-bar" hidden>
     <div>
       <h1 id="consignmentTitle">Consignment</h1>
-      <p id="consignmentSub"></p>
+      <p id="consignmentSub" class="consignment-sub"></p>
     </div>
     <div class="consignment-actions">
       <button class="btn secondary-btn" id="viewConsignmentBtn">View Consignment</button>
@@ -45,47 +51,46 @@
     <!-- SUMMARY -->
     <section id="view-summary" class="view-section">
       <div class="panel">
-        <div class="panel-header"><h2>Exporter Summary Dashboard</h2></div>
+        <div class="panel-header">
+          <h2>Exporter Summary Dashboard</h2>
+        </div>
         <div class="panel-body">
           <p class="muted">Overview of consignments, vessels and shipments on route.</p>
         </div>
       </div>
 
-      <div class="panel">
-        <div class="panel-header"><h3>Consignments</h3></div>
-        <div class="panel-body">
-          <table class="status-table" id="summaryConsignments">
-            <thead><tr><th>Consignment Ref</th><th>Container</th><th>Commodity</th><th>Market</th><th>Status</th><th>ETD</th><th>ETA</th></tr></thead>
-            <tbody></tbody>
-          </table>
+      <div class="grid-two">
+        <div class="panel">
+          <div class="panel-header"><h3>Consignments</h3></div>
+          <div class="panel-body">
+            <table class="status-table" id="summaryConsignments" aria-describedby="consignmentsDesc">
+              <caption id="consignmentsDesc" class="visually-hidden">List of consignments</caption>
+              <thead><tr><th>Consignment Ref</th><th>Container</th><th>Commodity</th><th>Market</th><th>Status</th><th>ETD</th><th>ETA</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
-      <div class="panel">
-        <div class="panel-header"><h3>Vessels</h3></div>
-        <div class="panel-body">
-          <table class="status-table" id="summaryVessels">
-            <thead><tr><th>Vessel / Voyage</th><th>POL</th><th>POD</th><th>ETD</th><th>ETA</th><th>Shipments</th></tr></thead>
-            <tbody></tbody>
-          </table>
+        <div class="panel">
+          <div class="panel-header"><h3>Vessels</h3></div>
+          <div class="panel-body">
+            <table class="status-table" id="summaryVessels"><thead><tr><th>Vessel / Voyage</th><th>POL</th><th>POD</th><th>ETD</th><th>ETA</th><th>Shipments</th></tr></thead><tbody></tbody></table>
+          </div>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-header"><h3>Shipments on Route</h3></div>
         <div class="panel-body">
-          <table class="status-table" id="summaryShipments">
-            <thead><tr><th>Consignment Ref</th><th>Container</th><th>Current Location</th><th>Cold Chain</th><th>Delay / Risk</th></tr></thead>
-            <tbody></tbody>
-          </table>
+          <table class="status-table" id="summaryShipments"><thead><tr><th>Consignment Ref</th><th>Container</th><th>Current Location</th><th>Cold Chain</th><th>Delay / Risk</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-header"><h3>Delays & Disruptions</h3></div>
         <div class="panel-body">
-          <p class="muted">Aggregated notices (Transnet, port alerts, marine news). For production use a server-side aggregator to avoid CORS and ensure reliability.</p>
-          <button id="refreshDelaysBtn" class="btn secondary-btn">Refresh external delays</button>
+          <p class="muted">Aggregated notices (Transnet, port alerts, marine news). Use server-side aggregator in production.</p>
+          <div class="delays-controls"><button id="refreshDelaysBtn" class="btn secondary-btn">Refresh external delays</button></div>
           <ul id="summaryDelays" class="muted-list"></ul>
         </div>
       </div>
@@ -97,24 +102,12 @@
         <div class="panel-header"><h2>New Booking Request</h2></div>
         <div class="panel-body">
           <form id="bookingForm" class="upload-form">
-            <div class="form-row">
-              <label>Exporter Reference</label><input id="bkExporterRef" required />
-            </div>
-            <div class="form-row">
-              <label>Commodity / Grade</label><input id="bkCommodity" required />
-            </div>
-            <div class="form-row">
-              <label>Expected Volume / Containers</label><input id="bkVolume" required />
-            </div>
-            <div class="form-row">
-              <label>Preferred Vessel / Week</label><input id="bkVessel" />
-            </div>
-            <div class="form-row">
-              <label>POL / POD</label><input id="bkRoute" placeholder="Ngqura → Rotterdam" />
-            </div>
-            <div class="form-row">
-              <label>Special Instructions</label><textarea id="bkNotes" rows="3"></textarea>
-            </div>
+            <div class="form-row"><label>Exporter Reference</label><input id="bkExporterRef" required /></div>
+            <div class="form-row"><label>Commodity / Grade</label><input id="bkCommodity" required /></div>
+            <div class="form-row"><label>Expected Volume / Containers</label><input id="bkVolume" required /></div>
+            <div class="form-row"><label>Preferred Vessel / Week</label><input id="bkVessel" /></div>
+            <div class="form-row"><label>POL / POD</label><input id="bkRoute" placeholder="Ngqura → Rotterdam" /></div>
+            <div class="form-row"><label>Special Instructions</label><textarea id="bkNotes" rows="3"></textarea></div>
             <button type="submit" class="btn primary-btn">Submit Booking Request</button>
             <p id="bookingFeedback" class="upload-note"></p>
           </form>
@@ -127,7 +120,7 @@
       <div class="panel">
         <div class="panel-header"><h2>Reports</h2></div>
         <div class="panel-body">
-          <p class="muted">Download summary CSV of consignments.</p>
+          <p class="muted">Download a CSV summary of consignments for Excel analysis.</p>
           <button id="downloadReportBtn" class="btn secondary-btn">Download Summary (CSV)</button>
         </div>
       </div>
@@ -137,7 +130,7 @@
     <section id="view-data" class="view-section" hidden>
       <div class="panel">
         <div class="panel-header"><h2>Data & Analytics</h2></div>
-        <div class="panel-body"><p class="muted">Placeholder for future data tools.</p></div>
+        <div class="panel-body"><p class="muted">Placeholder for future analytics and export stats.</p></div>
       </div>
     </section>
 
@@ -158,6 +151,13 @@
                   <tr><th>Market / Destination:</th><td id="marketDest">—</td></tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <div class="panel status-overview-panel">
+            <div class="panel-header"><h3>Status Overview</h3></div>
+            <div class="panel-body status-overview" id="statusOverview">
+              <!-- badges inserted by JS -->
             </div>
           </div>
 
@@ -188,16 +188,13 @@
             </div>
           </div>
 
-          <!-- Exporter Notes only visible to internal users -->
           <div class="panel" id="exporterNotesPanel" hidden>
-            <div class="panel-header"><h2>Exporter Notes (Internal)</h2></div>
-            <div class="panel-body">
-              <textarea id="exportNotes" class="notes-box" readonly></textarea>
-            </div>
+            <div class="panel-header"><h3>Exporter Notes (Internal)</h3></div>
+            <div class="panel-body"><textarea id="exportNotes" class="notes-box" readonly></textarea></div>
           </div>
 
           <div class="panel">
-            <div class="panel-header"><h2>Booking & Vessel Summary</h2></div>
+            <div class="panel-header"><h3>Booking & Vessel Summary</h3></div>
             <div class="panel-body">
               <table class="summary-table summary-table-wide">
                 <tbody>
@@ -213,28 +210,25 @@
 
         <section class="right-column">
           <div class="panel">
-            <div class="panel-header"><h2>Container Location</h2></div>
+            <div class="panel-header"><h3>Container Location</h3></div>
             <div class="panel-body">
               <div id="map" class="map-container" aria-label="Container map"></div>
-              <p id="mapMeta" class="map-meta"></p>
+              <p id="mapMeta" class="map-meta muted"></p>
             </div>
           </div>
 
           <div class="panel">
-            <div class="panel-header"><h2>Delays & Disruptions (File)</h2></div>
-            <div class="panel-body">
-              <ul id="fileDelays" class="muted-list"></ul>
-            </div>
+            <div class="panel-header"><h3>Delays & Disruptions (File)</h3></div>
+            <div class="panel-body"><ul id="fileDelays" class="muted-list"></ul></div>
           </div>
 
           <div class="panel">
-            <div class="panel-header"><h2>Messages on this File</h2></div>
+            <div class="panel-header"><h3>Messages on this File</h3></div>
             <div class="panel-body">
-              <ul id="messageList" class="muted-list"></ul>
-              <form id="messageForm" class="upload-form">
-                <label for="messageText" class="upload-label">Post a message</label>
+              <ul id="messageList" class="message-list"></ul>
+              <form id="messageForm" class="message-form">
                 <textarea id="messageText" rows="3" placeholder="Add an update or question..."></textarea>
-                <button class="btn secondary-btn" type="submit">Post Message</button>
+                <div class="message-form-row"><button class="btn secondary-btn" type="submit">Post Message</button></div>
               </form>
             </div>
           </div>
@@ -247,8 +241,11 @@
     <p>PA-CryoChain • Demo only — verify with official PPECB & DALRRD records.</p>
   </footer>
 
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9WjUyl8aI1ty0qSgCqo=" crossorigin=""></script>
+
+  <!-- dashboard behaviour -->
   <script src="dashboard.js" defer></script>
 </body>
 </html>
