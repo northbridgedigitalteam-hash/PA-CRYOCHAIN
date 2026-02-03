@@ -1,76 +1,51 @@
-// Improved login handling and safer localStorage use.
-// IDs must match index.html
+// Common page behaviours for PA-CryoChain demo
+// - populate footer year
+// - redirect to dashboard if already signed in (login/index pages)
+// - redirect to login if not signed in (dashboard page)
+// - optional service worker registration (uncomment to enable)
+
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Set footer year (if element exists)
-    const yearSpan = document.getElementById("year");
-    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+  // Populate any element with id="year"
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-    // 2. If a user is already logged in, send them straight to dashboard
-    const storedUserJson = localStorage.getItem("paCryoUser");
-    if (storedUserJson) {
-        try {
-            const storedUser = JSON.parse(storedUserJson);
-            const role = storedUser.role === "client" ? "client" : "internal";
-            const hash = role === "client" ? "#exporter" : "#internal";
-
-            // Prevent infinite loop: only redirect if we're on the login page
-            const path = window.location.pathname;
-            const isLoginPage =
-                path.endsWith("index.html") ||
-                path === "/" ||
-                path === "" ||
-                path.endsWith("/PA-CRYOCHAIN/");
-
-            if (isLoginPage) {
-                // use assign to keep history consistent
-                window.location.assign(`dashboard.html${hash}`);
-                return;
-            }
-        } catch (e) {
-            console.error("Invalid user data in localStorage, clearing it:", e);
-            localStorage.removeItem("paCryoUser");
-        }
+  // simple helper to get stored demo user
+  function getUser() {
+    try {
+      return JSON.parse(localStorage.getItem("paCryoUser") || "null");
+    } catch (e) {
+      console.warn("Invalid paCryoUser in localStorage, clearing it.");
+      localStorage.removeItem("paCryoUser");
+      return null;
     }
+  }
 
-    // 3. Handle login form submit
-    const loginForm = document.getElementById("loginForm");
-    if (!loginForm) return;
+  const user = getUser();
+  const pathname = window.location.pathname;
+  const isLoginPage = pathname.endsWith("/login.html") || pathname.endsWith("/index.html") || pathname === "/" || pathname.endsWith("/PA-CRYOCHAIN/");
+  const isDashboard = pathname.endsWith("/dashboard.html") || pathname.includes("/dashboard");
 
-    const feedbackEl = document.getElementById("loginFeedback");
+  // If user is logged in and they're on the login/landing page, send to dashboard
+  if (user && isLoginPage) {
+    // Role-based landing can be handled by dashboard logic (it will show exporter/internal)
+    window.location.replace("dashboard.html");
+    return;
+  }
 
-    loginForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        feedbackEl.textContent = "";
+  // If the user is not logged in and they're on the dashboard, send to login
+  if (!user && isDashboard) {
+    window.location.replace("login.html");
+    return;
+  }
 
-        const usernameInput = document.getElementById("username");
-        const roleSelect = document.getElementById("role");
-        const passwordInput = document.getElementById("password");
-
-        const username = (usernameInput?.value || "").trim();
-        const role = roleSelect?.value || ""; // "client" or "internal"
-        const password = passwordInput?.value || "";
-
-        if (!username || !role || !password) {
-            feedbackEl.textContent = "Please complete all fields before signing in.";
-            feedbackEl.classList.add("error");
-            return;
-        }
-
-        // DEMO ONLY - any credentials are accepted
-        const user = {
-            username,
-            role,
-            loginTime: new Date().toISOString()
-        };
-
-        try {
-            localStorage.setItem("paCryoUser", JSON.stringify(user));
-        } catch (e) {
-            console.error("Unable to save user in localStorage", e);
-        }
-
-        // Exporter lands on summary dashboard, internal on ops/file dashboard
-        const hash = role === "client" ? "#exporter" : "#internal";
-        window.location.assign(`dashboard.html${hash}`);
+  // Optional: register a service worker for caching (uncomment in production and add /sw.js)
+  /*
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('Service worker registered:', reg.scope);
+    }).catch(err => {
+      console.warn('Service worker registration failed:', err);
     });
+  }
+  */
 });
