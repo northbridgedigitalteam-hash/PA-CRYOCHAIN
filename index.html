@@ -1,104 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="PA-CryoChain — consignment & cold chain visibility demo for exporters and operations." />
-    <title>PA-CryoChain | Log In</title>
-
-    <!-- Login / global styles -->
-    <link rel="stylesheet" href="style.css" />
-
-    <!-- PWA Manifest (optional) -->
-    <link rel="manifest" href="manifest.json" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PA-CryoChain — Cold Chain Visibility</title>
+  <meta name="description" content="PA-CryoChain — consignment & cold-chain visibility for exporters and operations (demo)." />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-    <header class="site-header">
-        <div class="logo-area">
-            <div class="logo-symbol" aria-hidden="true">❄️🍎🍊</div>
-            <div class="logo-text">
-                <h1>PA-CryoChain</h1>
-                <p>Consignment & Cold Chain Visibility</p>
-            </div>
-        </div>
-    </header>
+<body class="landing-body">
+  <header class="site-header">
+    <div class="logo-area">
+      <div class="logo-symbol">❄️🍎🍊</div>
+      <div class="logo-text">
+        <h1>PA-CryoChain</h1>
+        <p>Consignment & cold chain visibility — demo</p>
+      </div>
+    </div>
+    <nav class="top-actions">
+      <a class="btn primary-btn" href="login.html">Sign in</a>
+    </nav>
+  </header>
 
-    <main class="auth-layout" aria-labelledby="authTitle">
-        <section class="auth-info">
-            <h2 id="authTitle">End-to-End Visibility for Citrus, Deciduous, Exotic & Stone Fruit</h2>
-            <p>
-                Track consignments, container positions, PPECB & DALRRD status, and documents in one
-                place.
-            </p>
-            <ul class="feature-list">
-                <li>Summary dashboard for exporters (consignments, vessels, shipments on route)</li>
-                <li>File-level dashboard for internal / operations</li>
-                <li>Integrated map & document status tracking</li>
-            </ul>
-        </section>
+  <main class="landing-main">
+    <section class="hero">
+      <h2>End-to-end visibility for citrus, deciduous, exotic & stone fruit</h2>
+      <p>Track consignments, container positions, PPECB & DALRRD statuses, documents and delays in one place. Demo site — sign in to explore.</p>
+      <p><a class="btn primary-btn" href="login.html">Sign in to demo</a></p>
+    </section>
 
-        <section class="auth-card" aria-labelledby="signinTitle">
-            <h2 id="signinTitle">Sign in to PA-CryoChain</h2>
+    <section class="features">
+      <article>
+        <h3>Exporter Summary</h3>
+        <p>Consignment summary, vessels, shipments on route and delays aggregated in a single view.</p>
+      </article>
+      <article>
+        <h3>File Dashboard</h3>
+        <p>File-level view with task timeline, document status (SI, Export certificate, Phyto, Origin certificate) and messaging.</p>
+      </article>
+      <article>
+        <h3>Bookings</h3>
+        <p>Exporters can submit booking requests to their agent via the Bookings tab.</p>
+      </article>
+    </section>
+  </main>
 
-            <!-- IMPORTANT: IDs must match script.js -->
-            <form id="loginForm" novalidate>
-                <div class="form-group">
-                    <label for="username">Email or Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        required
-                        placeholder="you@exporter.co.za"
-                        autocomplete="username"
-                    />
-                </div>
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> PA-CryoChain (Demo). For training and demonstration only.</p>
+  </footer>
 
-                <div class="form-group">
-                    <label for="role">Login As</label>
-                    <select id="role" name="role" required>
-                        <option value="">Select role...</option>
-                        <option value="client">Client / Exporter</option>
-                        <option value="internal">Internal Operations / PA</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        required
-                        placeholder="••••••••"
-                        autocomplete="current-password"
-                    />
-                </div>
-
-                <div id="loginFeedback" role="status" aria-live="polite" class="login-feedback"></div>
-
-                <button type="submit" class="btn primary-btn">Sign In</button>
-
-                <p class="disclaimer">
-                    Demo only – any username and password will work. PPECB & DALRRD statuses shown
-                    in the dashboard mirror operational information and do not replace official
-                    systems.
-                </p>
-            </form>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <p>
-            PPECB-aligned • DALRRD documentation compliant • Built for citrus, deciduous, exotic &
-            stone fruit exports.
-        </p>
-        <p class="footer-meta">
-            &copy; <span id="year"></span> PA-CryoChain. All rights reserved.
-        </p>
-    </footer>
-
-    <!-- IMPORTANT: include script.js before closing body -->
-    <script defer src="script.js"></script>
+  <script>
+    // set year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
