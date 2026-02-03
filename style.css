@@ -1,176 +1,21 @@
-:root {
-    --green-header: #7aa22f;
-    --green-header-dark: #567221;
-    --bg-page: #f5f7f9;
-    --card-bg: #ffffff;
-    --border: #d1d5db;
-    --text-main: #111827;
-    --text-muted: #6b7280;
-    --accent: #1d4ed8;
-    --radius-lg: 12px;
-    --radius-sm: 8px;
-    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+/* Login / global styles */
+:root{--bg:#f3f7f9;--card:#fff;--muted:#6b7280;--accent:#0f766e}
+*{box-sizing:border-box}
+body{margin:0;padding:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;background:var(--bg);color:#0f172a}
+.site-header{background:var(--card);padding:18px;border-bottom:1px solid #e6eef3;display:flex;justify-content:center}
+.logo-area{display:flex;gap:12px;align-items:center;max-width:1100px;width:100%}
+.logo-symbol{font-size:28px}
+.logo-text h1{margin:0;font-size:1.15rem}
+.auth-layout{max-width:1100px;margin:24px auto;display:grid;grid-template-columns:1fr 380px;gap:18px;padding:0 12px}
+.auth-info{padding:18px}
+.auth-card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.form-group{margin-bottom:12px;display:flex;flex-direction:column}
+.form-group label{font-size:0.9rem;margin-bottom:6px}
+.form-group input, .form-group select, .form-group textarea{padding:10px;border:1px solid #e6eef3;border-radius:6px;font-size:0.95rem}
+.disclaimer{font-size:0.8rem;color:var(--muted);margin-top:12px}
 
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    height: 100%;
-    margin: 0;
-    font-family: var(--font-main);
-    color: var(--text-main);
-    background: var(--bg-page);
-}
-
-/* Header */
-
-.site-header {
-    background: var(--green-header);
-    padding: 10px 20px;
-}
-
-.logo-area {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-}
-
-.logo-symbol {
-    font-size: 1.5rem;
-}
-
-.logo-text h1 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.logo-text p {
-    margin: 0;
-    font-size: 0.8rem;
-}
-
-/* Layout */
-
-.auth-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: 32px;
-    padding: 24px 24px 32px;
-    align-items: center;
-}
-
-.auth-info h2 {
-    margin-top: 0;
-    font-size: 1.4rem;
-}
-
-.auth-info p {
-    color: var(--text-muted);
-    max-width: 520px;
-}
-
-.feature-list {
-    padding-left: 18px;
-    margin-top: 14px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-/* Auth Card */
-
-.auth-card {
-    background: var(--card-bg);
-    border-radius: var(--radius-lg);
-    padding: 20px 18px 20px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
-}
-
-.auth-card h2 {
-    margin-top: 0;
-    margin-bottom: 14px;
-    font-size: 1.1rem;
-}
-
-.form-group {
-    margin-bottom: 12px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 8px 9px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    font-size: 0.9rem;
-}
-
-.form-group input::placeholder {
-    color: #9ca3af;
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    padding: 9px 16px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: background 0.15s ease-out, transform 0.1s ease-out;
-}
-
-.primary-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #fff;
-}
-
-.primary-btn:hover {
-    background: #1e40af;
-    transform: translateY(-1px);
-}
-
-.disclaimer {
-    margin-top: 12px;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-}
-
-/* Footer */
-
-.site-footer {
-    padding: 10px 20px 16px;
-    text-align: center;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-}
-
-.footer-meta {
-    margin-top: 2px;
-}
-
-/* Responsive */
-
-@media (max-width: 900px) {
-    .auth-layout {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 16px;
-    }
+.site-footer{max-width:1100px;margin:24px auto;padding:0 12px;color:var(--muted);font-size:0.9rem}
+.login-feedback{min-height:1.2rem;margin-bottom:6px;color:#b91c1c}
+@media (max-width:980px){
+  .auth-layout{grid-template-columns:1fr; padding:0 12px}
 }
