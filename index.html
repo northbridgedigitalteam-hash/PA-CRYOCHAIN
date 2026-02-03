@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="PA-CryoChain — consignment & cold chain visibility demo for exporters and operations." />
     <title>PA-CryoChain | Log In</title>
 
     <!-- Login / global styles -->
@@ -14,7 +15,7 @@
 <body>
     <header class="site-header">
         <div class="logo-area">
-            <div class="logo-symbol">❄️🍎🍊</div>
+            <div class="logo-symbol" aria-hidden="true">❄️🍎🍊</div>
             <div class="logo-text">
                 <h1>PA-CryoChain</h1>
                 <p>Consignment & Cold Chain Visibility</p>
@@ -22,24 +23,25 @@
         </div>
     </header>
 
-    <main class="auth-layout">
+    <main class="auth-layout" aria-labelledby="authTitle">
         <section class="auth-info">
-            <h2>End-to-End Visibility for Citrus, Deciduous, Exotic & Stone Fruit</h2>
+            <h2 id="authTitle">End-to-End Visibility for Citrus, Deciduous, Exotic & Stone Fruit</h2>
             <p>
                 Track consignments, container positions, PPECB & DALRRD status, and documents in one
                 place.
             </p>
             <ul class="feature-list">
-                <li>• Summary dashboard for exporters (consignments, vessels, shipments on route)</li>
-                <li>• File-level dashboard for internal / operations</li>
-                <li>• Integrated map & document status tracking</li>
+                <li>Summary dashboard for exporters (consignments, vessels, shipments on route)</li>
+                <li>File-level dashboard for internal / operations</li>
+                <li>Integrated map & document status tracking</li>
             </ul>
         </section>
 
-        <section class="auth-card">
-            <h2>Sign in to PA-CryoChain</h2>
+        <section class="auth-card" aria-labelledby="signinTitle">
+            <h2 id="signinTitle">Sign in to PA-CryoChain</h2>
+
             <!-- IMPORTANT: IDs must match script.js -->
-            <form id="loginForm">
+            <form id="loginForm" novalidate>
                 <div class="form-group">
                     <label for="username">Email or Username</label>
                     <input
@@ -48,6 +50,7 @@
                         name="username"
                         required
                         placeholder="you@exporter.co.za"
+                        autocomplete="username"
                     />
                 </div>
 
@@ -68,8 +71,11 @@
                         name="password"
                         required
                         placeholder="••••••••"
+                        autocomplete="current-password"
                     />
                 </div>
+
+                <div id="loginFeedback" role="status" aria-live="polite" class="login-feedback"></div>
 
                 <button type="submit" class="btn primary-btn">Sign In</button>
 
@@ -93,6 +99,6 @@
     </footer>
 
     <!-- IMPORTANT: include script.js before closing body -->
-    <script src="script.js"></script>
+    <script defer src="script.js"></script>
 </body>
 </html>
