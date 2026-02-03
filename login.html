@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PA-CryoChain — Log In</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo-area">
+      <div class="logo-symbol">❄️🍎🍊</div>
+      <div class="logo-text">
+        <h1>PA-CryoChain</h1>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-layout">
+    <section class="auth-info">
+      <h2>PA-CryoChain Demo</h2>
+      <p>Choose a role and sign in. Demo accepts any username/password — for production integrate a secure backend.</p>
+      <ul class="feature-list">
+        <li>Exporter: summary dashboard and ability to open files, post messages and create bookings.</li>
+        <li>Internal (ops): full file view including exporter notes and operational controls.</li>
+      </ul>
+    </section>
+
+    <section class="auth-card">
+      <h2>Sign in</h2>
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="username">Email or Username</label>
+          <input id="username" name="username" type="text" required placeholder="you@exporter.co.za" autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+          <label for="role">Login As</label>
+          <select id="role" name="role" required>
+            <option value="">Select role...</option>
+            <option value="client">Exporter</option>
+            <option value="internal">Internal / Operations</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required placeholder="password" autocomplete="current-password" />
+        </div>
+
+        <div id="loginFeedback" class="login-feedback" aria-live="polite"></div>
+
+        <button class="btn primary-btn" type="submit">Sign in</button>
+      </form>
+      <p class="disclaimer">Demo only — any credentials work. Data stored in browser for demo purposes.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> PA-CryoChain (Demo)</p>
+  </footer>
+
+  <script>
+    // minimal login handler; stores role in localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('year').textContent = new Date().getFullYear();
+      const form = document.getElementById('loginForm');
+      const fb = document.getElementById('loginFeedback');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fb.textContent = '';
+        const username = (document.getElementById('username').value || '').trim();
+        const role = document.getElementById('role').value;
+        const password = document.getElementById('password').value || '';
+        if (!username || !role || !password) {
+          fb.textContent = 'Complete all fields.';
+          return;
+        }
+        const user = { username, role, loginTime: new Date().toISOString() };
+        try { localStorage.setItem('paCryoUser', JSON.stringify(user)); }
+        catch(e){ console.warn('localStorage error', e); }
+        // Go to dashboard (hash to communicate which initial sub-view if needed)
+        window.location.href = 'dashboard.html';
+      });
+    });
+  </script>
+</body>
+</html>
