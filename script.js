@@ -1,15 +1,11 @@
+// Improved login handling and safer localStorage use.
+// IDs must match index.html
 document.addEventListener("DOMContentLoaded", () => {
-    // -------------------------------------------------------------------------
     // 1. Set footer year (if element exists)
-    // -------------------------------------------------------------------------
     const yearSpan = document.getElementById("year");
-    if (yearSpan) {
-        yearSpan.textContent = new Date().getFullYear();
-    }
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-    // -------------------------------------------------------------------------
     // 2. If a user is already logged in, send them straight to dashboard
-    // -------------------------------------------------------------------------
     const storedUserJson = localStorage.getItem("paCryoUser");
     if (storedUserJson) {
         try {
@@ -23,11 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 path.endsWith("index.html") ||
                 path === "/" ||
                 path === "" ||
-                // adjust this if your GitHub Pages repo name changes
                 path.endsWith("/PA-CRYOCHAIN/");
 
             if (isLoginPage) {
-                window.location.href = `dashboard.html${hash}`;
+                // use assign to keep history consistent
+                window.location.assign(`dashboard.html${hash}`);
                 return;
             }
         } catch (e) {
@@ -36,17 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // -------------------------------------------------------------------------
     // 3. Handle login form submit
-    // -------------------------------------------------------------------------
     const loginForm = document.getElementById("loginForm");
-    if (!loginForm) {
-        // No login form on this page; nothing more to do.
-        return;
-    }
+    if (!loginForm) return;
+
+    const feedbackEl = document.getElementById("loginFeedback");
 
     loginForm.addEventListener("submit", (event) => {
         event.preventDefault();
+        feedbackEl.textContent = "";
 
         const usernameInput = document.getElementById("username");
         const roleSelect = document.getElementById("role");
@@ -57,7 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = passwordInput?.value || "";
 
         if (!username || !role || !password) {
-            alert("Please complete all fields before signing in.");
+            feedbackEl.textContent = "Please complete all fields before signing in.";
+            feedbackEl.classList.add("error");
             return;
         }
 
@@ -68,10 +63,14 @@ document.addEventListener("DOMContentLoaded", () => {
             loginTime: new Date().toISOString()
         };
 
-        localStorage.setItem("paCryoUser", JSON.stringify(user));
+        try {
+            localStorage.setItem("paCryoUser", JSON.stringify(user));
+        } catch (e) {
+            console.error("Unable to save user in localStorage", e);
+        }
 
         // Exporter lands on summary dashboard, internal on ops/file dashboard
         const hash = role === "client" ? "#exporter" : "#internal";
-        window.location.href = `dashboard.html${hash}`;
+        window.location.assign(`dashboard.html${hash}`);
     });
 });
